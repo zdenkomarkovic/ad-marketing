@@ -1,0 +1,2 @@
+na Image postavi  unoptimized
+npm run images:optimize
