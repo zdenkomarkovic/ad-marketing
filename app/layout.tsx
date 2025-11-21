@@ -1,6 +1,4 @@
-import ButtonToTop from "@/components/ButtonToTop";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import ConditionalLayout from "@/components/ConditionalLayout";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -43,10 +41,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-muted-foreground bg-muted  text-base md:text-xl`}
       >
-        <Header />
-        {children}
-        <ButtonToTop />
-        <Footer />
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );
