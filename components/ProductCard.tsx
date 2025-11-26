@@ -29,6 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           fill
           className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          loading="lazy"
         />
         {product.Brand && (
           <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">

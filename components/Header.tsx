@@ -55,7 +55,7 @@ const DesktopNav = () => (
         <Link key={index} href={item.link}>
           <motion.li
             className="transition-colors underline-animation"
-            whileHover={{ color: "hsl(var(--primary))", scale: 1.1 }}
+            whileHover={{ scale: 1.1 }}
           >
             {item.title}
           </motion.li>
