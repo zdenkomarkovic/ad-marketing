@@ -74,7 +74,7 @@ export default function CategoriesNavClient({ categories }: Props) {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-card border border-border rounded-lg shadow-lg mb-4 overflow-hidden">
+          <div className="md:hidden bg-card border border-border rounded-lg shadow-lg mb-4 overflow-y-auto max-h-[70vh]">
             {categories.map((category) => (
               <div
                 key={category.Id}
