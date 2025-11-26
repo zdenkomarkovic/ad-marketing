@@ -24,6 +24,19 @@ export interface Product {
   Status?: string;
 }
 
+export interface Category {
+  Id: string;
+  Name: string;
+  Parent: string;
+  Image?: string;
+}
+
+export interface Brand {
+  Id: string;
+  Name: string;
+  Image?: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   token_type: string;
@@ -84,7 +97,7 @@ export async function fetchProducts(language: string = 'sr-Latin-CS'): Promise<P
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -172,7 +185,7 @@ export async function fetchProductImages(productId: string, language: string = '
  * Fetch all categories
  * @param language - Language code
  */
-export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise<any[]> {
+export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise<Category[]> {
   try {
     const token = await login();
 
@@ -182,7 +195,7 @@ export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
@@ -200,7 +213,7 @@ export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise
  * Fetch all brands
  * @param language - Language code
  */
-export async function fetchBrands(language: string = 'sr-Latin-CS'): Promise<any[]> {
+export async function fetchBrands(language: string = 'sr-Latin-CS'): Promise<Brand[]> {
   try {
     const token = await login();
 
@@ -210,7 +223,7 @@ export async function fetchBrands(language: string = 'sr-Latin-CS'): Promise<any
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
