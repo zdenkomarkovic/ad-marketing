@@ -41,7 +41,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       id: p.Id,
       name: p.Name,
       category: p.Category,
-      subCategory: p.SubCategory
+      subCategory: p.SubCategory,
     });
   });
 
@@ -58,7 +58,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     // Check SubCategory field
     let subCategoryMatch = false;
     if (product.SubCategory) {
-      if (typeof product.SubCategory === "object" && product.SubCategory !== null) {
+      if (
+        typeof product.SubCategory === "object" &&
+        product.SubCategory !== null
+      ) {
         subCategoryMatch = product.SubCategory.Id === decodedCategoryId;
       } else if (typeof product.SubCategory === "string") {
         subCategoryMatch = product.SubCategory === decodedCategoryId;
@@ -83,7 +86,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <>
       <CategoriesNav />
       <div className="pt-4">
-        <section className="py-10 md:py-20 bg-background">
+        <section className="py-28 bg-background">
           <div className="max-w-[80rem] mx-auto px-4 md:px-8">
             <h2 className="text-4xl md:text-5xl font-bold text-primary text-center mb-10 md:mb-16">
               {categoryName}

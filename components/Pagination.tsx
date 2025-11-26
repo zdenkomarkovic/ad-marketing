@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -49,27 +50,29 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
   }
 
   return (
-    <nav className="flex items-center justify-center gap-2 mt-8">
+    <nav className="flex items-center justify-center gap-1 md:gap-2 mt-8 px-2">
       {/* Previous button */}
       {currentPage > 1 ? (
         <Link
           href={`${basePath}?page=${currentPage - 1}`}
-          className="px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors"
+          className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
         >
-          ← Prethodna
+          <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Prethodna</span>
         </Link>
       ) : (
-        <span className="px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed">
-          ← Prethodna
+        <span className="px-2 md:px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed flex items-center gap-1">
+          <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Prethodna</span>
         </span>
       )}
 
       {/* Page numbers */}
-      <div className="flex gap-2">
+      <div className="flex gap-0.5 md:gap-2">
         {pages.map((page, idx) => {
           if (page < 0) {
             return (
-              <span key={`ellipsis-${idx}`} className="px-4 py-2">
+              <span key={`ellipsis-${idx}`} className="px-1 md:px-4 py-2 hidden sm:inline">
                 ...
               </span>
             );
@@ -79,7 +82,7 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
             <Link
               key={page}
               href={`${basePath}?page=${page}`}
-              className={`px-4 py-2 border rounded-lg transition-colors ${
+              className={`px-1.5 md:px-4 py-2 border rounded-lg transition-colors text-sm md:text-base min-w-[32px] md:min-w-[44px] text-center ${
                 currentPage === page
                   ? "bg-primary text-primary-foreground border-primary"
                   : "border-border hover:bg-secondary"
@@ -95,13 +98,15 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
       {currentPage < totalPages ? (
         <Link
           href={`${basePath}?page=${currentPage + 1}`}
-          className="px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors"
+          className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
         >
-          Sledeća →
+          <span className="hidden sm:inline">Sledeća</span>
+          <ChevronRight className="w-4 h-4" />
         </Link>
       ) : (
-        <span className="px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed">
-          Sledeća →
+        <span className="px-2 md:px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed flex items-center gap-1">
+          <span className="hidden sm:inline">Sledeća</span>
+          <ChevronRight className="w-4 h-4" />
         </span>
       )}
     </nav>

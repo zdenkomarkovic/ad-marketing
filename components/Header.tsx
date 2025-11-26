@@ -24,12 +24,12 @@ import {
 } from "./ui/accordion";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "./ui/hover-card";
 
-const mobTitleStyles = "text-lg py-2";
+const mobTitleStyles = "text-lg py-2  text-muted";
 
 const MobileMenu = () => (
   <Sheet>
-    <SheetTrigger className="lg:hidden">
-      <MenuIcon className="text-primary cursor-pointer" />
+    <SheetTrigger className="lg:hidden  text-muted">
+      <MenuIcon className=" text-muted cursor-pointer" />
     </SheetTrigger>
     <SheetContent>
       <SheetHeader>
@@ -155,30 +155,30 @@ export default function Header() {
       className={`flex justify-center ${
         scrolled
           ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-md"
-          : "bg-transparent"
+          : "bg-transparent "
       }  fixed top-0 left-0 right-0 z-[50] transition-colors`}
     >
-      <nav className="flex items-center justify-between px-8 py-4 max-w-[80rem] w-full text-primary font-bold">
+      <nav className="flex items-center text-white justify-between px-8 py-4 max-w-[80rem] w-full font-bold">
         <Link href="/" className="">
           <Image
             src={Logo}
             alt="dm rustic 24"
             width={50}
             height={50}
-            className="rounded-full"
+            className=""
           />
         </Link>
         <DesktopNav />
-        <Link href="tel:+3816">
+        <Link href="tel:+381691015511">
           <motion.button
             whileHover={{
               color: "hsl(var(--foreground))",
               backgroundColor: "hsl(var(--primary))",
             }}
-            className=" items-center justify-center rounded-full text-primary border-primary border-2 text-sm md:text-lg py-1 px-2 md:py-2 md:px-4 transition-colors flex"
+            className=" items-center justify-center rounded-full   border-2 text-sm md:text-lg py-1 px-2 md:py-2 md:px-4 transition-colors flex"
           >
             <PhoneIcon />
-            <p className="">+38160 000 000</p>
+            <p className="">069/101 55 11</p>
           </motion.button>
         </Link>
         <MobileMenu />

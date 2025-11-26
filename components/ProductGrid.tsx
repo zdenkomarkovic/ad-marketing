@@ -39,7 +39,7 @@ export default async function ProductGrid({
   const totalPages = limit ? 0 : Math.ceil(allProducts.length / itemsPerPage);
 
   return (
-    <section className="py-20 md:py-40 bg-background">
+    <section className="py-40 bg-background">
       <div className="max-w-[80rem] mx-auto px-4 md:px-8">
         {error && (
           <div className="text-center text-red-600 mb-8 p-4 bg-red-50 rounded-lg">

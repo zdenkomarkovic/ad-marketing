@@ -50,12 +50,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <main className="min-h-screen py-10 md:py-20 bg-background">
+    <main className="min-h-screen py-24 bg-background">
       <div className="max-w-[80rem] mx-auto px-4 md:px-8">
         {/* Back button */}
         <Link
           href="/proizvodi"
-          className="inline-flex items-center text-primary hover:underline mb-6"
+          className="inline-flex items-center text-white hover:underline mb-6"
         >
           ← Nazad na proizvode
         </Link>
@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.Name}
             </h1>
 
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted">
               Šifra proizvoda: <span className="font-mono">{product.Id}</span>
             </div>
 
@@ -93,16 +93,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
 
             {/* Product Details */}
-            <div className="border-t border-border pt-6 space-y-4">
+            <div className="border-t border-muted pt-6 space-y-4">
               <h2 className="text-xl font-semibold">Detalji proizvoda</h2>
 
               <div className="grid grid-cols-2 gap-4">
                 {product.Category && (
                   <div>
-                    <div className="text-sm text-muted-foreground">
-                      Kategorija
-                    </div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Kategorija</div>
+                    <div className="font-medium text-muted">
                       {typeof product.Category === "string"
                         ? product.Category
                         : product.Category.Name}
@@ -112,10 +110,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.SubCategory && product.SubCategory !== "*" && (
                   <div>
-                    <div className="text-sm text-muted-foreground">
-                      Podkategorija
-                    </div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Podkategorija</div>
+                    <div className="font-medium text-muted">
                       {typeof product.SubCategory === "string"
                         ? product.SubCategory
                         : product.SubCategory.Name}
@@ -125,8 +121,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.Color && (
                   <div>
-                    <div className="text-sm text-muted-foreground">Boja</div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Boja</div>
+                    <div className="font-medium text-muted">
                       {typeof product.Color === "string"
                         ? product.Color
                         : product.Color.Name}
@@ -136,10 +132,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.Size && product.Size !== "*" && (
                   <div>
-                    <div className="text-sm text-muted-foreground">
-                      Veličina
-                    </div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Veličina</div>
+                    <div className="font-medium text-muted">
                       {typeof product.Size === "string"
                         ? product.Size
                         : product.Size.Id}
@@ -149,8 +143,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.Shade && (
                   <div>
-                    <div className="text-sm text-muted-foreground">Nijanša</div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Nijansa</div>
+                    <div className="font-medium text-muted">
                       {typeof product.Shade === "string"
                         ? product.Shade
                         : product.Shade.Name}
@@ -160,10 +154,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.Stock !== undefined && (
                   <div>
-                    <div className="text-sm text-muted-foreground">
-                      Na stanju
-                    </div>
-                    <div className="font-medium">
+                    <div className="text-sm text-muted">Na stanju</div>
+                    <div className="font-medium text-muted">
                       {product.Stock > 0 ? "Dostupno" : "Nije dostupno"}
                     </div>
                   </div>
@@ -171,10 +163,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {product.Status && (
                   <div>
-                    <div className="text-sm text-muted-foreground">Status</div>
+                    <div className="text-sm text-muted">Status</div>
                     <div>
                       <span
-                        className={`inline-block px-2 py-1 rounded text-xs ${
+                        className={`inline-block px-2 py-1 rounded  text-xs ${
                           product.Status === "active" ||
                           product.Status === "Active"
                             ? "bg-green-100 text-green-800"
@@ -192,9 +184,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {(product.Description ||
               product.Model?.Description ||
               product.Model?.Description2) && (
-              <div className="border-t border-border pt-6">
+              <div className="border-t border-muted pt-6">
                 <h2 className="text-xl font-semibold mb-3">Opis</h2>
-                <div className="text-muted-foreground leading-relaxed space-y-2">
+                <div className="text-muted leading-relaxed space-y-2">
                   {product.Description && <p>{product.Description}</p>}
                   {product.Model?.Description && (
                     <p>{product.Model.Description}</p>
@@ -207,7 +199,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
 
             {/* Contact CTA */}
-            <div className="border-t border-border pt-6">
+            <div className="border-t border-muted pt-6">
               <Link
                 href="/kontakt"
                 className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"

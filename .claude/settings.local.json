@@ -6,7 +6,9 @@
       "Bash(npm run dev:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(dir /b)",
+      "Bash(paste:*)"
     ],
     "deny": [],
     "ask": []
