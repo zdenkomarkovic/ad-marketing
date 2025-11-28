@@ -7,9 +7,10 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   basePath?: string;
+  onPageChange?: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, basePath = "/" }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, basePath = "/", onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const pages = [];
@@ -49,17 +50,35 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
     pages.push(totalPages);
   }
 
+  const handlePageChange = (page: number) => {
+    if (onPageChange) {
+      onPageChange(page);
+      // Scroll to top of page smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="flex items-center justify-center gap-1 md:gap-2 mt-8 px-2">
       {/* Previous button */}
       {currentPage > 1 ? (
-        <Link
-          href={`${basePath}?page=${currentPage - 1}`}
-          className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Prethodna</span>
-        </Link>
+        onPageChange ? (
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Prethodna</span>
+          </button>
+        ) : (
+          <Link
+            href={`${basePath}?page=${currentPage - 1}`}
+            className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Prethodna</span>
+          </Link>
+        )
       ) : (
         <span className="px-2 md:px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed flex items-center gap-1">
           <ChevronLeft className="w-4 h-4" />
@@ -78,7 +97,19 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
             );
           }
 
-          return (
+          return onPageChange ? (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-1.5 md:px-4 py-2 border rounded-lg transition-colors text-sm md:text-base min-w-[32px] md:min-w-[44px] text-center ${
+                currentPage === page
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border hover:bg-secondary"
+              }`}
+            >
+              {page}
+            </button>
+          ) : (
             <Link
               key={page}
               href={`${basePath}?page=${page}`}
@@ -96,13 +127,23 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
 
       {/* Next button */}
       {currentPage < totalPages ? (
-        <Link
-          href={`${basePath}?page=${currentPage + 1}`}
-          className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
-        >
-          <span className="hidden sm:inline">Sledeća</span>
-          <ChevronRight className="w-4 h-4" />
-        </Link>
+        onPageChange ? (
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
+          >
+            <span className="hidden sm:inline">Sledeća</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        ) : (
+          <Link
+            href={`${basePath}?page=${currentPage + 1}`}
+            className="px-2 md:px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors flex items-center gap-1"
+          >
+            <span className="hidden sm:inline">Sledeća</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        )
       ) : (
         <span className="px-2 md:px-4 py-2 border border-border rounded-lg text-muted-foreground cursor-not-allowed flex items-center gap-1">
           <span className="hidden sm:inline">Sledeća</span>

@@ -74,7 +74,7 @@ export default function CategoriesNavClient({ categories }: Props) {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-card border border-border rounded-lg shadow-lg mb-4 overflow-y-auto max-h-[70vh]">
+          <div className="md:hidden bg-card border-2 border-primary/20 rounded-xl shadow-2xl mb-4 overflow-y-auto max-h-[70vh] mt-3">
             {categories.map((category) => (
               <div
                 key={category.Id}
@@ -83,7 +83,7 @@ export default function CategoriesNavClient({ categories }: Props) {
                 <div className="flex items-center justify-between">
                   <Link
                     href={`/categories/${encodeURIComponent(category.Id)}`}
-                    className="flex-1 px-4 py-1 text-foreground font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="flex-1 px-4 py-3 text-foreground font-semibold text-base hover:bg-primary hover:text-primary-foreground transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {category.Name}
@@ -91,10 +91,10 @@ export default function CategoriesNavClient({ categories }: Props) {
                   {category.subcategories.length > 0 && (
                     <button
                       onClick={() => toggleCategory(category.Id)}
-                      className="px-4  hover:bg-secondary/50 transition-colors"
+                      className="px-4 py-3 hover:bg-secondary/50 transition-colors"
                     >
                       <ChevronDown
-                        className={`w-4 h-4 text-foreground transition-transform ${
+                        className={`w-5 h-5 text-foreground transition-transform ${
                           openCategory === category.Id ? "rotate-180" : ""
                         }`}
                       />
@@ -105,15 +105,15 @@ export default function CategoriesNavClient({ categories }: Props) {
                 {/* Subcategories */}
                 {category.subcategories.length > 0 &&
                   openCategory === category.Id && (
-                    <div className="bg-muted">
+                    <div className="bg-muted/50">
                       {category.subcategories.map((subcat) => (
                         <Link
                           key={subcat.Id}
                           href={`/categories/${encodeURIComponent(subcat.Id)}`}
-                          className="block px-8 py-1 text-sm text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                          className="block px-8 py-2.5 text-sm text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all font-medium"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          {subcat.Name}
+                          • {subcat.Name}
                         </Link>
                       ))}
                     </div>
@@ -124,30 +124,33 @@ export default function CategoriesNavClient({ categories }: Props) {
         )}
 
         {/* Desktop Menu - Hidden on Mobile */}
-        <div className="hidden md:flex justify-between text-white flex-wrap items-center min-w-full">
+        <div className="hidden md:flex justify-between text-white flex-wrap items-center min-w-full gap-1">
           {categories.map((category) => (
             <div key={category.Id} className="group relative">
               <Link
                 href={`/categories/${encodeURIComponent(category.Id)}`}
-                className="text-xs md:text-sm font-medium hover:text-primary whitespace-nowrap px-0.5 md:px-1 lg:px-2 py-1 md:py-2 rounded-md hover:bg-secondary/50 transition-colors inline-flex items-center gap-0.5 md:gap-1"
+                className="text-sm lg:text-base font-semibold hover:text-primary whitespace-nowrap px-2 lg:px-3 py-2 rounded-lg hover:bg-secondary/60 transition-all inline-flex items-center gap-1 border-2 border-transparent hover:border-primary/30"
               >
                 {category.Name}
                 {category.subcategories.length > 0 && (
-                  <ChevronDown className="w-3 md:w-4 h-3 md:h-4" />
+                  <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
                 )}
               </Link>
 
               {/* Dropdown for subcategories */}
               {category.subcategories.length > 0 && (
-                <div className="hidden group-hover:block absolute left-0 top-full bg-card border border-border rounded-lg shadow-2xl z-[9999] min-w-[250px]">
-                  <div className="py-2">
+                <div className="hidden group-hover:block absolute left-0 top-full mt-1 bg-card border-2 border-primary/20 rounded-xl shadow-2xl z-[9999] min-w-[280px] max-h-[400px] overflow-y-auto">
+                  <div className="py-3">
+                    <div className="px-4 py-2 text-xs font-bold text-primary uppercase tracking-wider border-b border-border">
+                      {category.Name}
+                    </div>
                     {category.subcategories.map((subcat) => (
                       <Link
                         key={subcat.Id}
                         href={`/categories/${encodeURIComponent(subcat.Id)}`}
-                        className="block px-4 py-2.5 text-sm text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                        className="block px-4 py-2.5 text-sm text-foreground hover:bg-primary/90 hover:text-primary-foreground transition-all hover:translate-x-1 hover:font-medium"
                       >
-                        {subcat.Name}
+                        • {subcat.Name}
                       </Link>
                     ))}
                   </div>

@@ -8,8 +8,9 @@ export const navList = [
     link: "/o-nama",
   },
   {
-    title: "Proizvodi",
-    link: "/proizvodi",
+    title: "Kategorije",
+    link: "/proizvodi-filter",
+    hasDropdown: true,
   },
   {
     title: "Naša štampa",

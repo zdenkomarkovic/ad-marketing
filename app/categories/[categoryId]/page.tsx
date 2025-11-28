@@ -1,53 +1,61 @@
 import { fetchProducts, fetchCategories } from "@/lib/promosolution-api";
-import ProductCard from "@/components/ProductCard";
-import Pagination from "@/components/Pagination";
-import CategoriesNav from "@/components/CategoriesNav";
+import GroupedFilteredProductsView from "@/components/GroupedFilteredProductsView";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{
     categoryId: string;
   }>;
-  searchParams: Promise<{
-    page?: string;
-  }>;
 }
 
-export default async function CategoryPage({ params, searchParams }: Props) {
-  const { categoryId } = await params;
-  const { page = "1" } = await searchParams;
-  const currentPage = parseInt(page, 10);
-  const itemsPerPage = 12;
+function ProductsViewSkeleton() {
+  return (
+    <div className="py-40 bg-background">
+      <div className="max-w-[90rem] mx-auto px-4 md:px-8">
+        <div className="flex gap-6">
+          {/* Sidebar skeleton */}
+          <div className="hidden lg:block w-64 xl:w-72">
+            <div className="bg-card border border-border rounded-lg p-4 h-[600px] animate-pulse" />
+          </div>
 
-  // Decode the category ID from URL
+          {/* Products skeleton */}
+          <div className="flex-1">
+            <div className="h-20 bg-card border border-border rounded-lg mb-6 animate-pulse" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-card rounded-lg overflow-hidden border border-border animate-pulse"
+                >
+                  <div className="aspect-square bg-muted" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted rounded w-1/2" />
+                    <div className="h-8 bg-muted rounded w-full mt-4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default async function CategoryPage({ params }: Props) {
+  const { categoryId } = await params;
   const decodedCategoryId = decodeURIComponent(categoryId);
 
-  // Fetch all products and categories
   const allProducts = await fetchProducts("sr-Latin-CS");
   const allCategories = await fetchCategories("sr-Latin-CS");
 
-  // Find category name
   const category = allCategories.find((c) => c.Id === decodedCategoryId);
   const categoryName = category?.Name || decodedCategoryId;
-
-  console.log("=== CATEGORY DEBUG ===");
-  console.log("Category ID:", decodedCategoryId);
-  console.log("Category Name:", categoryName);
-  console.log("Total products:", allProducts.length);
-
-  // Log first 3 products to see their structure
-  console.log("Sample products:");
-  allProducts.slice(0, 3).forEach((p, i) => {
-    console.log(`Product ${i}:`, {
-      id: p.Id,
-      name: p.Name,
-      category: p.Category,
-      subCategory: p.SubCategory,
-    });
-  });
+  const isSubcategory = category?.Parent !== "*";
 
   // Filter products by category or subcategory
   const filteredProducts = allProducts.filter((product) => {
-    // Check Category field
     let categoryMatch = false;
     if (typeof product.Category === "object" && product.Category !== null) {
       categoryMatch = product.Category.Id === decodedCategoryId;
@@ -55,7 +63,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       categoryMatch = product.Category === decodedCategoryId;
     }
 
-    // Check SubCategory field
     let subCategoryMatch = false;
     if (product.SubCategory) {
       if (
@@ -68,54 +75,37 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       }
     }
 
-    const matches = categoryMatch || subCategoryMatch;
+    // If we're viewing a subcategory, also include products where
+    // the parent category matches and no subcategory is specified
+    let parentCategoryMatch = false;
+    if (isSubcategory && category?.Parent) {
+      if (typeof product.Category === "object" && product.Category !== null) {
+        parentCategoryMatch = product.Category.Id === category.Parent;
+      } else if (typeof product.Category === "string") {
+        parentCategoryMatch = product.Category === category.Parent;
+      }
+    }
 
-    return matches;
+    return categoryMatch || subCategoryMatch || (parentCategoryMatch && !product.SubCategory);
   });
-
-  console.log("Filtered products count:", filteredProducts.length);
-  console.log("===================");
-
-  // Pagination
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <>
-      <CategoriesNav />
-      <div className="pt-4">
-        <section className="py-28 bg-background">
-          <div className="max-w-[80rem] mx-auto px-4 md:px-8">
-            <h2 className="text-4xl md:text-5xl font-bold text-primary text-center mb-10 md:mb-16">
-              {categoryName}
-            </h2>
-
-            {filteredProducts.length === 0 ? (
-              <div className="text-center text-muted-foreground">
-                Nema proizvoda u ovoj kategoriji.
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {paginatedProducts.map((product) => (
-                    <ProductCard key={product.Id} product={product} />
-                  ))}
-                </div>
-
-                {totalPages > 1 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    basePath={`/categories/${encodeURIComponent(categoryId)}`}
-                  />
-                )}
-              </>
-            )}
-          </div>
-        </section>
+      {/* Hero Section */}
+      <div className="pt-32 pb-16 bg-gradient-to-b from-primary/10 via-background to-background">
+        <div className="max-w-[80rem] mx-auto px-4 md:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+            <span className="text-primary">{categoryName}</span>
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Pregledajte našu ponudu proizvoda u kategoriji {categoryName}
+          </p>
+        </div>
       </div>
+
+      <Suspense fallback={<ProductsViewSkeleton />}>
+        <GroupedFilteredProductsView products={filteredProducts} />
+      </Suspense>
     </>
   );
 }
