@@ -38,6 +38,7 @@ export default function FilteredProductsView({
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Extract unique filter options from products
   const filterOptions = useMemo(() => {
@@ -110,6 +111,17 @@ export default function FilteredProductsView({
   // Filter products
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      // Search filter - search by name or product ID
+      if (searchTerm.trim()) {
+        const search = searchTerm.toLowerCase().trim();
+        const nameMatch = product.Name.toLowerCase().includes(search);
+        const idMatch = product.Id.toLowerCase().includes(search);
+
+        if (!nameMatch && !idMatch) {
+          return false;
+        }
+      }
+
       // Category filter
       if (selectedFilters.categories.length > 0) {
         const categoryId = typeof product.Category === "string" ? product.Category : product.Category?.Id;
@@ -154,7 +166,7 @@ export default function FilteredProductsView({
 
       return true;
     });
-  }, [products, selectedFilters]);
+  }, [products, selectedFilters, searchTerm]);
 
   // Sort products
   const sortedProducts = useMemo(() => {
@@ -283,6 +295,11 @@ export default function FilteredProductsView({
               itemsPerPage={itemsPerPage}
               onItemsPerPageChange={(items) => {
                 setItemsPerPage(items);
+                setCurrentPage(1);
+              }}
+              searchTerm={searchTerm}
+              onSearchChange={(value) => {
+                setSearchTerm(value);
                 setCurrentPage(1);
               }}
             />
