@@ -1,8 +1,8 @@
 // PromoSolution API helper functions
 
-const API_BASE_URL = 'https://apiv1.promosolution.services';
-const API_USERNAME = 'admarketing';
-const API_PASSWORD = 'dRem-IpagI23C-hlpodAku';
+const API_BASE_URL = "https://apiv1.promosolution.services";
+const API_USERNAME = "admarketing";
+const API_PASSWORD = "dRem-IpagI23C-hlpodAku";
 
 // Types
 export interface Product {
@@ -12,9 +12,16 @@ export interface Product {
   Brand: { Id: string; Image: string } | string;
   Category: { Id: string; Name: string } | string;
   SubCategory?: { Id: string; Name: string } | string;
-  Color: { Id: string; Name: string; Image: string; HtmlColor: string } | string;
-  Shade: { Id: string; Name: string; Image: string; HtmlColor: string } | string;
-  Size: { Id: string; KidsSize: boolean; Image: string; Category: string } | string | null;
+  Color:
+    | { Id: string; Name: string; Image: string; HtmlColor: string }
+    | string;
+  Shade:
+    | { Id: string; Name: string; Image: string; HtmlColor: string }
+    | string;
+  Size:
+    | { Id: string; KidsSize: boolean; Image: string; Category: string }
+    | string
+    | null;
   Model?: {
     Id: string;
     Name: string;
@@ -26,7 +33,13 @@ export interface Product {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
-  Images?: Array<{ No: number; Image: string; ImageWebP?: string; ImageGif?: string; Video?: string }>;
+  Images?: Array<{
+    No: number;
+    Image: string;
+    ImageWebP?: string;
+    ImageGif?: string;
+    Video?: string;
+  }>;
   Price?: number;
   Image?: string;
   Description?: string;
@@ -129,17 +142,17 @@ async function login(): Promise<string> {
   }
 
   const formData = new URLSearchParams();
-  formData.append('grant_type', 'password');
-  formData.append('username', API_USERNAME);
-  formData.append('password', API_PASSWORD);
+  formData.append("grant_type", "password");
+  formData.append("username", API_USERNAME);
+  formData.append("password", API_PASSWORD);
 
   const response = await fetch(`${API_BASE_URL}/token`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     body: formData.toString(),
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -159,55 +172,76 @@ async function login(): Promise<string> {
  * Fetch all products from PromoSolution API
  * @param language - Language code (sr-Latin-CS, en-US, de-DE, mk-MK)
  */
-export async function fetchProducts(language: string = 'sr-Latin-CS'): Promise<Product[]> {
+export async function fetchProducts(
+  language: string = "sr-Latin-CS"
+): Promise<Product[]> {
   try {
     const token = await login();
 
     // Fetch products and stock data in parallel
     const [productsResponse, stockData] = await Promise.all([
       fetch(`${API_BASE_URL}/${language}/api/Product`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         next: { revalidate: 3600 }, // Cache for 1 hour
       }),
-      fetchProductStock(language)
+      fetchProductStock(language),
     ]);
 
     if (!productsResponse.ok) {
-      throw new Error(`Failed to fetch products: ${productsResponse.status} ${productsResponse.statusText}`);
+      throw new Error(
+        `Failed to fetch products: ${productsResponse.status} ${productsResponse.statusText}`
+      );
     }
 
     const products: Product[] = await productsResponse.json();
 
     // Create a map of stock data by ProductId for quick lookup
-    const stockMap = new Map<string, Array<{ Warehouse: string; Qty: number }>>();
-    stockData.forEach(stock => {
+    const stockMap = new Map<
+      string,
+      Array<{ Warehouse: string; Qty: number }>
+    >();
+    stockData.forEach((stock) => {
       if (!stockMap.has(stock.ProductId)) {
         stockMap.set(stock.ProductId, []);
       }
       stockMap.get(stock.ProductId)!.push({
         Warehouse: stock.Warehouse,
-        Qty: stock.Qty
+        Qty: stock.Qty,
       });
     });
 
     // Fix textile product categorization and add stock information
-    const fixedProducts = products.map(product => {
-      const categoryId = typeof product.Category === 'object' ? product.Category.Id : product.Category;
+    const fixedProducts = products.map((product) => {
+      const categoryId =
+        typeof product.Category === "object"
+          ? product.Category.Id
+          : product.Category;
 
-      let updatedProduct = { ...product };
+      const updatedProduct = { ...product };
 
       // Fix textile products - use Group2 instead of SubCategory
-      if (categoryId === 'TX' && product.Group2) {
+      if (categoryId === "TX" && product.Group2) {
         const GROUP2_TO_SUBCATEGORY: Record<string, string> = {
-          'TX-01': 'TX - 01', 'TX-02': 'TX - 02', 'TX-03': 'TX - 03',
-          'TX-04': 'TX - 04', 'TX-05': 'TX - 05', 'TX-06': 'TX - 06',
-          'TX-07': 'TX - 07', 'TX-10': 'TX - 05', 'TX-13': 'TX - 07',
-          'TX-16': 'TX - 07', 'TX-19': 'TX - 10', 'TX-25': 'TX - 99',
-          'WW-01': 'TX - 06', 'WW-03': 'TX - 06', 'WW-05': 'TX - 06', 'WW-07': 'TX - 06',
+          "TX-01": "TX - 01",
+          "TX-02": "TX - 02",
+          "TX-03": "TX - 03",
+          "TX-04": "TX - 04",
+          "TX-05": "TX - 05",
+          "TX-06": "TX - 06",
+          "TX-07": "TX - 07",
+          "TX-10": "TX - 05",
+          "TX-13": "TX - 07",
+          "TX-16": "TX - 07",
+          "TX-19": "TX - 10",
+          "TX-25": "TX - 99",
+          "WW-01": "TX - 06",
+          "WW-03": "TX - 06",
+          "WW-05": "TX - 06",
+          "WW-07": "TX - 06",
         };
 
         const mappedSubCategory = GROUP2_TO_SUBCATEGORY[product.Group2];
@@ -227,7 +261,7 @@ export async function fetchProducts(language: string = 'sr-Latin-CS'): Promise<P
 
     return fixedProducts;
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     throw error;
   }
 }
@@ -237,36 +271,41 @@ export async function fetchProducts(language: string = 'sr-Latin-CS'): Promise<P
  * @param productId - Product ID (e.g., "5301610-L")
  * @param language - Language code
  */
-export async function fetchProduct(productId: string, language: string = 'sr-Latin-CS'): Promise<Product | null> {
+export async function fetchProduct(
+  productId: string,
+  language: string = "sr-Latin-CS"
+): Promise<Product | null> {
   try {
     const token = await login();
 
     // Handle products with "/" in size (encode as %2F)
-    const encodedId = productId.replace(/\//g, '%2F');
-    const url = productId.includes('/')
+    const encodedId = productId.replace(/\//g, "%2F");
+    const url = productId.includes("/")
       ? `${API_BASE_URL}/${language}/api/Product/?id=${encodedId}`
       : `${API_BASE_URL}/${language}/api/Product/${productId}`;
 
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     if (!response.ok) {
       if (response.status === 404) {
         return null;
       }
-      throw new Error(`Failed to fetch product: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch product: ${response.status} ${response.statusText}`
+      );
     }
 
     const product: Product = await response.json();
     return product;
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error("Error fetching product:", error);
     throw error;
   }
 }
@@ -276,27 +315,33 @@ export async function fetchProduct(productId: string, language: string = 'sr-Lat
  * @param productId - Product ID
  * @param language - Language code
  */
-export async function fetchProductImages(productId: string, language: string = 'sr-Latin-CS'): Promise<string[]> {
+export async function fetchProductImages(
+  productId: string,
+  language: string = "sr-Latin-CS"
+): Promise<string[]> {
   try {
     const token = await login();
 
-    const response = await fetch(`${API_BASE_URL}/${language}/api/ProductImage/${productId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/${language}/api/ProductImage/${productId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
       return [];
     }
 
     const images: Array<{ Image: string }> = await response.json();
-    return images.map(img => img.Image);
+    return images.map((img) => img.Image);
   } catch (error) {
-    console.error('Error fetching product images:', error);
+    console.error("Error fetching product images:", error);
     return [];
   }
 }
@@ -305,26 +350,33 @@ export async function fetchProductImages(productId: string, language: string = '
  * Fetch product stock information
  * @param language - Language code
  */
-export async function fetchProductStock(language: string = 'sr-Latin-CS'): Promise<ProductStock[]> {
+export async function fetchProductStock(
+  language: string = "sr-Latin-CS"
+): Promise<ProductStock[]> {
   try {
     const token = await login();
 
-    const response = await fetch(`${API_BASE_URL}/${language}/api/ProductStock`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 300 }, // Cache for 5 minutes (stock changes frequently)
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/${language}/api/ProductStock`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        next: { revalidate: 300 }, // Cache for 5 minutes (stock changes frequently)
+      }
+    );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch product stock: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch product stock: ${response.status} ${response.statusText}`
+      );
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching product stock:', error);
+    console.error("Error fetching product stock:", error);
     return [];
   }
 }
@@ -333,15 +385,17 @@ export async function fetchProductStock(language: string = 'sr-Latin-CS'): Promi
  * Fetch all categories
  * @param language - Language code
  */
-export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise<Category[]> {
+export async function fetchCategories(
+  language: string = "sr-Latin-CS"
+): Promise<Category[]> {
   try {
     const token = await login();
 
     const response = await fetch(`${API_BASE_URL}/${language}/api/Category`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
@@ -352,7 +406,7 @@ export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error("Error fetching categories:", error);
     return [];
   }
 }
@@ -361,15 +415,17 @@ export async function fetchCategories(language: string = 'sr-Latin-CS'): Promise
  * Fetch all brands
  * @param language - Language code
  */
-export async function fetchBrands(language: string = 'sr-Latin-CS'): Promise<Brand[]> {
+export async function fetchBrands(
+  language: string = "sr-Latin-CS"
+): Promise<Brand[]> {
   try {
     const token = await login();
 
     const response = await fetch(`${API_BASE_URL}/${language}/api/Brand`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
@@ -380,7 +436,7 @@ export async function fetchBrands(language: string = 'sr-Latin-CS'): Promise<Bra
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching brands:', error);
+    console.error("Error fetching brands:", error);
     return [];
   }
 }

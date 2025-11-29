@@ -65,14 +65,14 @@ export function extractProductDetails(product: Product): ProductDetails {
   // Dimensions - Check Specifications array first, then dimensional fields
   // Look for exact "Dimenzija" first, not "Preporučena dimenzija štampe"
   if (product.Specifications) {
-    const dimSpec = product.Specifications.find((s: any) =>
+    const dimSpec = product.Specifications.find((s) =>
       s.Name && (s.Name.toLowerCase() === 'dimenzija' || s.Name.toLowerCase() === 'dimension')
     );
     if (dimSpec && dimSpec.Value) {
       details.dimensions = dimSpec.Value.trim();
     } else {
       // Fallback to any field containing dimension
-      const anyDimSpec = product.Specifications.find((s: any) =>
+      const anyDimSpec = product.Specifications.find((s) =>
         s.Name && (s.Name.toLowerCase().includes('dimenzija') || s.Name.toLowerCase().includes('dimension')) &&
         !s.Name.toLowerCase().includes('štampe') && !s.Name.toLowerCase().includes('print')
       );
@@ -106,7 +106,7 @@ export function extractProductDetails(product: Product): ProductDetails {
 
   // Material - Check Specifications first, then Stickers, then direct field
   if (product.Specifications) {
-    const materialSpec = product.Specifications.find((s: any) =>
+    const materialSpec = product.Specifications.find((s) =>
       s.Name && (s.Name.toLowerCase().includes('materijal') || s.Name.toLowerCase().includes('material'))
     );
     if (materialSpec && materialSpec.Value) {
@@ -116,7 +116,7 @@ export function extractProductDetails(product: Product): ProductDetails {
 
   // If not found in Specifications, check Stickers for material-related info
   if (!details.material && product.Stickers) {
-    const materialSticker = product.Stickers.find((s: any) =>
+    const materialSticker = product.Stickers.find((s) =>
       s.Name && (s.Name.toLowerCase().includes('plastika') ||
                  s.Name.toLowerCase().includes('metal') ||
                  s.Name.toLowerCase().includes('drvo') ||
