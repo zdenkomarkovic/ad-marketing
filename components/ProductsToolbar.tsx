@@ -31,7 +31,8 @@ export default function ProductsToolbar({
       {/* Left side - Product count and items per page */}
       <div className="flex items-center gap-4 flex-wrap">
         <p className="text-sm text-muted-foreground">
-          Ukupno proizvoda: <span className="font-semibold text-foreground">{totalProducts}</span>
+          Ukupno proizvoda:{" "}
+          <span className="font-semibold text-foreground">{totalProducts}</span>
         </p>
 
         <div className="flex items-center gap-2">
@@ -39,7 +40,7 @@ export default function ProductsToolbar({
           <select
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+            className="px-3 py-1.5 text-sm text-muted border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
           >
             <option value={12}>12</option>
             <option value={24}>24</option>
@@ -56,10 +57,10 @@ export default function ProductsToolbar({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Pretraži po imenu ili šifri..."
-          className="w-full px-4 py-1.5 pl-9 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+          className="w-full text-muted px-4 py-1.5 placeholder:text-muted pl-9 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
         />
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -76,7 +77,12 @@ export default function ProductsToolbar({
             onClick={() => onSearchChange("")}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 text-muted"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -95,7 +101,7 @@ export default function ProductsToolbar({
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+            className="px-3 py-1.5 text-sm text-muted border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
           >
             <option value="name-asc">Naziv (A-Z)</option>
             <option value="name-desc">Naziv (Z-A)</option>

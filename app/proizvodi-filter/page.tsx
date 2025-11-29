@@ -43,16 +43,7 @@ export default async function ProizvodiFilterPage() {
   return (
     <>
       {/* Hero Section */}
-      <div className="pt-32 pb-16 bg-gradient-to-b from-primary/10 via-background to-background">
-        <div className="max-w-[80rem] mx-auto px-4 md:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
-            Naši <span className="text-primary">Proizvodi</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Pregledajte našu kompletnu ponudu promotivnih artikala i pronađite savršene proizvode za vaš brend
-          </p>
-        </div>
-      </div>
+      <div className="pt-20 pb-16 bg-gradient-to-b from-primary/10 via-background to-background"></div>
 
       <Suspense fallback={<ProductsViewSkeleton />}>
         <GroupedFilteredProductsView products={products} />

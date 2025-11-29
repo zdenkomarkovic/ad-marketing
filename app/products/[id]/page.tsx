@@ -42,22 +42,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const fullProduct = await fetchProduct(productId, "sr-Latin-CS");
 
   return (
-    <main className="min-h-screen py-24 bg-gray-400">
-      <div className="max-w-[80rem] mx-auto px-4 md:px-8">
-        {/* Back button */}
-        <Link
-          href="/proizvodi-filter"
-          className="inline-flex items-center text-white hover:underline mb-6"
-        >
-          ← Nazad na proizvode
-        </Link>
+    <>
+      <div className="pt-20 pb-10 bg-gradient-to-b from-primary/10 via-background to-background"></div>
+      <main className="min-h-screen pb-12 bg-background">
+        <div className="max-w-[80rem] mx-auto px-4 md:px-8">
+          {/* Back button */}
+          <Link
+            href="/proizvodi-filter"
+            className="inline-flex items-center text-white hover:underline mb-6"
+          >
+            ← Nazad na proizvode
+          </Link>
 
-        <DetailedProductView
-          groupedProduct={groupedProduct}
-          currentVariantId={productId}
-          fullProduct={fullProduct || undefined}
-        />
-      </div>
-    </main>
+          <DetailedProductView
+            groupedProduct={groupedProduct}
+            currentVariantId={productId}
+            fullProduct={fullProduct || undefined}
+          />
+        </div>
+      </main>
+    </>
   );
 }

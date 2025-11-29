@@ -10,7 +10,12 @@ interface PaginationProps {
   onPageChange?: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, basePath = "/", onPageChange }: PaginationProps) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+  basePath = "/",
+  onPageChange,
+}: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const pages = [];
@@ -54,12 +59,12 @@ export default function Pagination({ currentPage, totalPages, basePath = "/", on
     if (onPageChange) {
       onPageChange(page);
       // Scroll to top of page smoothly
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
-    <nav className="flex items-center justify-center gap-1 md:gap-2 mt-8 px-2">
+    <nav className="flex items-center justify-center gap-1 md:gap-2 mt-8 px-2 text-muted">
       {/* Previous button */}
       {currentPage > 1 ? (
         onPageChange ? (
@@ -91,7 +96,10 @@ export default function Pagination({ currentPage, totalPages, basePath = "/", on
         {pages.map((page, idx) => {
           if (page < 0) {
             return (
-              <span key={`ellipsis-${idx}`} className="px-1 md:px-4 py-2 hidden sm:inline">
+              <span
+                key={`ellipsis-${idx}`}
+                className="px-1 md:px-4 py-2 hidden sm:inline"
+              >
                 ...
               </span>
             );

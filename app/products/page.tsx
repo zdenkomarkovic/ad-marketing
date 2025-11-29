@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function ProductsRedirect() {
-  redirect("/proizvodi");
+  redirect("/proizvodi-filter");
 }

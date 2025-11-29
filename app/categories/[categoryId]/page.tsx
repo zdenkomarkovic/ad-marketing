@@ -86,20 +86,21 @@ export default async function CategoryPage({ params }: Props) {
       }
     }
 
-    return categoryMatch || subCategoryMatch || (parentCategoryMatch && !product.SubCategory);
+    return (
+      categoryMatch ||
+      subCategoryMatch ||
+      (parentCategoryMatch && !product.SubCategory)
+    );
   });
 
   return (
     <>
       {/* Hero Section */}
-      <div className="pt-32 pb-16 bg-gradient-to-b from-primary/10 via-background to-background">
+      <div className="pt-32 pb-10 bg-gradient-to-b from-primary/10 via-background to-background">
         <div className="max-w-[80rem] mx-auto px-4 md:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
             <span className="text-primary">{categoryName}</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Pregledajte našu ponudu proizvoda u kategoriji {categoryName}
-          </p>
         </div>
       </div>
 
