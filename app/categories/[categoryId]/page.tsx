@@ -1,6 +1,6 @@
 import { fetchProducts, fetchCategories } from "@/lib/promosolution-api";
-import GroupedFilteredProductsView from "@/components/GroupedFilteredProductsView";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 
 interface Props {
   params: Promise<{
@@ -42,6 +42,14 @@ function ProductsViewSkeleton() {
     </div>
   );
 }
+
+// Dynamically import the heavy client component
+const GroupedFilteredProductsView = dynamic(
+  () => import("@/components/GroupedFilteredProductsView"),
+  {
+    loading: () => <ProductsViewSkeleton />,
+  }
+);
 
 export default async function CategoryPage({ params }: Props) {
   const { categoryId } = await params;

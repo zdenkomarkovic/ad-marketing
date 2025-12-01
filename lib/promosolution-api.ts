@@ -290,7 +290,7 @@ export async function fetchProduct(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 1800 }, // Cache for 30 minutes
     });
 
     if (!response.ok) {

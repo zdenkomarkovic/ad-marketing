@@ -2,7 +2,22 @@ import { fetchProducts, fetchProduct } from "@/lib/promosolution-api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groupProductsByBaseId, getBaseId } from "@/lib/product-grouping";
-import DetailedProductView from "@/components/DetailedProductView";
+import dynamic from "next/dynamic";
+
+// Dynamically import the heavy client component
+const DetailedProductView = dynamic(
+  () => import("@/components/DetailedProductView"),
+  {
+    loading: () => (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Učitavanje proizvoda...</p>
+        </div>
+      </div>
+    ),
+  }
+);
 
 interface ProductPageProps {
   params: Promise<{

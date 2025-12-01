@@ -100,29 +100,39 @@ export default function DetailedProductView({
       setIsLoadingImages(true);
 
       const variantImages = getVariantImagesClient(selectedVariant.id, 8);
-      const validImages: string[] = [];
 
-      for (const imageUrl of variantImages) {
-        try {
+      // Load all images in parallel for better performance
+      const imagePromises = variantImages.map((imageUrl) => {
+        return new Promise<{ url: string; loaded: boolean; index: number }>((resolve) => {
           const img = document.createElement("img");
-          const loadPromise = new Promise<boolean>((resolve) => {
-            img.onload = () => resolve(true);
-            img.onerror = () => resolve(false);
-            img.src = imageUrl;
-          });
+          const index = variantImages.indexOf(imageUrl);
 
-          const loaded = await loadPromise;
-          if (loaded) {
-            validImages.push(imageUrl);
-          } else {
-            break;
-          }
-        } catch {
-          break;
-        }
-      }
+          const timeout = setTimeout(() => {
+            resolve({ url: imageUrl, loaded: false, index });
+          }, 3000); // 3 second timeout per image
 
-      if (validImages.length === 0) {
+          img.onload = () => {
+            clearTimeout(timeout);
+            resolve({ url: imageUrl, loaded: true, index });
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            resolve({ url: imageUrl, loaded: false, index });
+          };
+          img.src = imageUrl;
+        });
+      });
+
+      const results = await Promise.all(imagePromises);
+
+      // Filter valid images and keep them in order
+      const validImages = results
+        .filter(result => result.loaded)
+        .sort((a, b) => a.index - b.index)
+        .map(result => result.url);
+
+      // If no images loaded successfully, use the first one anyway
+      if (validImages.length === 0 && variantImages.length > 0) {
         validImages.push(variantImages[0]);
       }
 
