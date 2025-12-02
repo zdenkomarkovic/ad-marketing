@@ -9,7 +9,7 @@ export const navList = [
   },
   {
     title: "Kategorije",
-    link: "/proizvodi-filter",
+    link: "",
     hasDropdown: true,
   },
   {
