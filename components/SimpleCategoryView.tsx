@@ -1,13 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Product } from "@/lib/promosolution-api";
-import { groupProductsByBaseId, GroupedProduct } from "@/lib/product-grouping";
+import { GroupedProduct } from "@/lib/product-grouping";
 import GroupedProductCard from "./GroupedProductCard";
 import ProductsToolbar from "./ProductsToolbar";
 
 interface SimpleCategoryViewProps {
   categoryId: string;
+}
+
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalProducts: number;
+  productsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export default function SimpleCategoryView({
@@ -16,42 +24,50 @@ export default function SimpleCategoryView({
   const [products, setProducts] = useState<GroupedProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+    totalProducts: 0,
+    productsPerPage: 32,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 64;
+  const productsPerPage = 32;
 
   const [sortBy, setSortBy] = useState("name-asc");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch products directly from API (like the other site)
+  // Fetch products from API with server-side pagination
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        console.log(`[Client] Fetching products for category: ${categoryId}`);
+        console.log(`[Client] Fetching page ${currentPage} for category: ${categoryId}`);
         const startTime = Date.now();
 
-        // Direct API call - simple, no cache (like the other site)
+        // Server-side paginated API call - returns already grouped products
         const response = await fetch(
-          `/api/products/category/${encodeURIComponent(categoryId)}/simple`
+          `/api/products/category/${encodeURIComponent(categoryId)}/simple?page=${currentPage}&limit=${productsPerPage}`
         );
 
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.statusText}`);
         }
 
-        const rawProducts: Product[] = await response.json();
-
-        // Group products on client-side
-        const grouped = groupProductsByBaseId(rawProducts);
+        const data = await response.json();
+        // Server already returns grouped products - no need to group again!
+        const groupedProducts: GroupedProduct[] = data.products;
 
         const duration = Date.now() - startTime;
-        console.log(`[Client] Loaded ${grouped.length} grouped products in ${duration}ms`);
+        console.log(`[Client] Loaded ${groupedProducts.length} grouped products (page ${currentPage}) in ${duration}ms`);
 
-        setProducts(grouped);
+        setProducts(groupedProducts);
+        setPagination(data.pagination);
       } catch (err) {
         console.error("[Client] Error fetching products:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -61,9 +77,9 @@ export default function SimpleCategoryView({
     };
 
     fetchCategoryProducts();
-  }, [categoryId]);
+  }, [categoryId, currentPage, productsPerPage]);
 
-  // Sort products
+  // Sort products (client-side sorting on current page)
   const sortedProducts = [...products].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
@@ -79,27 +95,14 @@ export default function SimpleCategoryView({
     }
   });
 
-  // Filter by search
-  const filteredProducts = searchTerm.trim()
-    ? sortedProducts.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.baseId.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : sortedProducts;
-
-  // Pagination
-  const totalProducts = filteredProducts.length;
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const endIndex = startIndex + productsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+  // No client-side filtering - server handles pagination
+  const displayProducts = sortedProducts;
 
   return (
     <div className="py-8 md:py-12 bg-background">
       <div className="max-w-[90rem] mx-auto px-4 md:px-8">
         <ProductsToolbar
-          totalProducts={totalProducts}
+          totalProducts={pagination.totalProducts}
           sortBy={sortBy}
           onSortChange={setSortBy}
           viewMode={viewMode}
@@ -140,7 +143,7 @@ export default function SimpleCategoryView({
         )}
 
         {/* Empty State */}
-        {!loading && !error && filteredProducts.length === 0 && (
+        {!loading && !error && displayProducts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">
               Nema dostupnih proizvoda.
@@ -149,7 +152,7 @@ export default function SimpleCategoryView({
         )}
 
         {/* Products Grid */}
-        {!loading && !error && paginatedProducts.length > 0 && (
+        {!loading && !error && displayProducts.length > 0 && (
           <>
             <div
               className={
@@ -158,27 +161,27 @@ export default function SimpleCategoryView({
                   : "flex flex-col gap-4 mt-6"
               }
             >
-              {paginatedProducts.map((product) => (
+              {displayProducts.map((product) => (
                 <GroupedProductCard key={product.baseId} product={product} />
               ))}
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {pagination.totalPages > 1 && (
               <div className="flex justify-center items-center gap-4 mt-8">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
+                  disabled={!pagination.hasPrevPage || loading}
                   className="px-4 py-2 bg-primary text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Prethodna
                 </button>
                 <span className="text-muted-foreground">
-                  Stranica {currentPage} od {totalPages}
+                  Stranica {pagination.currentPage} od {pagination.totalPages} ({pagination.totalProducts} proizvoda)
                 </span>
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
+                  disabled={!pagination.hasNextPage || loading}
                   className="px-4 py-2 bg-primary text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Sledeća

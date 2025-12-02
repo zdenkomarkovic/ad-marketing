@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { fetchProducts, fetchCategories } from '@/lib/promosolution-api';
+import { groupProductsByBaseId } from '@/lib/product-grouping';
 
 /**
- * Simple API endpoint - fetches products directly like the other site
- * No caching, straightforward approach
+ * Server-side paginated API endpoint
+ * Returns only the requested page of GROUPED products for fast loading
  */
 export async function GET(
   request: Request,
@@ -13,7 +14,12 @@ export async function GET(
     const { categoryId } = await params;
     const decodedCategoryId = decodeURIComponent(categoryId);
 
-    console.log(`[API Simple] Fetching products for category: ${decodedCategoryId}`);
+    // Get pagination params from URL
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '32');
+
+    console.log(`[API Paginated] Category: ${decodedCategoryId}, Page: ${page}, Limit: ${limit}`);
     const startTime = Date.now();
 
     // Fetch everything directly (like the other site)
@@ -62,12 +68,33 @@ export async function GET(
       );
     });
 
-    const duration = Date.now() - startTime;
-    console.log(`[API Simple] Filtered ${filteredProducts.length} products in ${duration}ms`);
+    // GROUP FIRST - before pagination!
+    const groupedProducts = groupProductsByBaseId(filteredProducts);
 
-    return NextResponse.json(filteredProducts);
+    const totalProducts = groupedProducts.length;
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // Apply pagination to GROUPED products
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedProducts = groupedProducts.slice(startIndex, endIndex);
+
+    const duration = Date.now() - startTime;
+    console.log(`[API Paginated] Returning ${paginatedProducts.length} GROUPED products of ${totalProducts} (page ${page}/${totalPages}) in ${duration}ms`);
+
+    return NextResponse.json({
+      products: paginatedProducts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        productsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      }
+    });
   } catch (error) {
-    console.error('[API Simple] Error:', error);
+    console.error('[API Paginated] Error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
