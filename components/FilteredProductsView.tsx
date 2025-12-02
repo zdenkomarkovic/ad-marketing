@@ -42,17 +42,35 @@ export default function FilteredProductsView({
 
   // Extract unique filter options from products
   const filterOptions = useMemo(() => {
-    const categoriesMap = new Map<string, { id: string; name: string; count: number }>();
-    const brandsMap = new Map<string, { id: string; name: string; count: number }>();
-    const colorsMap = new Map<string, { id: string; name: string; count: number }>();
-    const sizesMap = new Map<string, { id: string; name: string; count: number }>();
+    const categoriesMap = new Map<
+      string,
+      { id: string; name: string; count: number }
+    >();
+    const brandsMap = new Map<
+      string,
+      { id: string; name: string; count: number }
+    >();
+    const colorsMap = new Map<
+      string,
+      { id: string; name: string; count: number }
+    >();
+    const sizesMap = new Map<
+      string,
+      { id: string; name: string; count: number }
+    >();
     const materialsSet = new Set<string>();
 
     products.forEach((product) => {
       // Categories
       if (product.Category) {
-        const categoryId = typeof product.Category === "string" ? product.Category : product.Category.Id;
-        const categoryName = typeof product.Category === "string" ? product.Category : product.Category.Name;
+        const categoryId =
+          typeof product.Category === "string"
+            ? product.Category
+            : product.Category.Id;
+        const categoryName =
+          typeof product.Category === "string"
+            ? product.Category
+            : product.Category.Name;
         const existing = categoriesMap.get(categoryId);
         categoriesMap.set(categoryId, {
           id: categoryId,
@@ -63,7 +81,8 @@ export default function FilteredProductsView({
 
       // Brands
       if (product.Brand) {
-        const brandId = typeof product.Brand === "string" ? product.Brand : product.Brand.Id;
+        const brandId =
+          typeof product.Brand === "string" ? product.Brand : product.Brand.Id;
         const existing = brandsMap.get(brandId);
         brandsMap.set(brandId, {
           id: brandId,
@@ -74,8 +93,12 @@ export default function FilteredProductsView({
 
       // Colors
       if (product.Color) {
-        const colorId = typeof product.Color === "string" ? product.Color : product.Color.Id;
-        const colorName = typeof product.Color === "string" ? product.Color : product.Color.Name;
+        const colorId =
+          typeof product.Color === "string" ? product.Color : product.Color.Id;
+        const colorName =
+          typeof product.Color === "string"
+            ? product.Color
+            : product.Color.Name;
         const existing = colorsMap.get(colorId);
         colorsMap.set(colorId, {
           id: colorId,
@@ -86,7 +109,8 @@ export default function FilteredProductsView({
 
       // Sizes
       if (product.Size && product.Size !== "*") {
-        const sizeId = typeof product.Size === "string" ? product.Size : product.Size.Id;
+        const sizeId =
+          typeof product.Size === "string" ? product.Size : product.Size.Id;
         const existing = sizesMap.get(sizeId);
         sizesMap.set(sizeId, {
           id: sizeId,
@@ -100,11 +124,19 @@ export default function FilteredProductsView({
     });
 
     return {
-      categories: Array.from(categoriesMap.values()).sort((a, b) => a.name.localeCompare(b.name)),
-      brands: Array.from(brandsMap.values()).sort((a, b) => a.name.localeCompare(b.name)),
-      colors: Array.from(colorsMap.values()).sort((a, b) => a.name.localeCompare(b.name)),
-      sizes: Array.from(sizesMap.values()).sort((a, b) => a.name.localeCompare(b.name)),
-      materials: Array.from(materialsSet).map(m => ({ id: m, name: m })),
+      categories: Array.from(categoriesMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+      brands: Array.from(brandsMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+      colors: Array.from(colorsMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+      sizes: Array.from(sizesMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+      materials: Array.from(materialsSet).map((m) => ({ id: m, name: m })),
     };
   }, [products]);
 
@@ -124,7 +156,10 @@ export default function FilteredProductsView({
 
       // Category filter
       if (selectedFilters.categories.length > 0) {
-        const categoryId = typeof product.Category === "string" ? product.Category : product.Category?.Id;
+        const categoryId =
+          typeof product.Category === "string"
+            ? product.Category
+            : product.Category?.Id;
         if (!categoryId || !selectedFilters.categories.includes(categoryId)) {
           return false;
         }
@@ -132,7 +167,8 @@ export default function FilteredProductsView({
 
       // Brand filter
       if (selectedFilters.brands.length > 0) {
-        const brandId = typeof product.Brand === "string" ? product.Brand : product.Brand?.Id;
+        const brandId =
+          typeof product.Brand === "string" ? product.Brand : product.Brand?.Id;
         if (!brandId || !selectedFilters.brands.includes(brandId)) {
           return false;
         }
@@ -140,7 +176,8 @@ export default function FilteredProductsView({
 
       // Color filter
       if (selectedFilters.colors.length > 0) {
-        const colorId = typeof product.Color === "string" ? product.Color : product.Color?.Id;
+        const colorId =
+          typeof product.Color === "string" ? product.Color : product.Color?.Id;
         if (!colorId || !selectedFilters.colors.includes(colorId)) {
           return false;
         }
@@ -148,8 +185,13 @@ export default function FilteredProductsView({
 
       // Size filter
       if (selectedFilters.sizes.length > 0) {
-        const sizeId = typeof product.Size === "string" ? product.Size : product.Size?.Id;
-        if (!sizeId || sizeId === "*" || !selectedFilters.sizes.includes(sizeId)) {
+        const sizeId =
+          typeof product.Size === "string" ? product.Size : product.Size?.Id;
+        if (
+          !sizeId ||
+          sizeId === "*" ||
+          !selectedFilters.sizes.includes(sizeId)
+        ) {
           return false;
         }
       }
@@ -215,7 +257,9 @@ export default function FilteredProductsView({
     } else if (filterType === "maxPrice") {
       setSelectedFilters({ ...selectedFilters, maxPrice: 10000 });
     } else {
-      const currentValues = selectedFilters[filterType as keyof typeof selectedFilters] as string[];
+      const currentValues = selectedFilters[
+        filterType as keyof typeof selectedFilters
+      ] as string[];
       const newValues = currentValues.filter((v) => v !== value);
       setSelectedFilters({
         ...selectedFilters,
@@ -251,7 +295,10 @@ export default function FilteredProductsView({
                 Filteri i pretraga
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
+            <SheetContent
+              side="left"
+              className="w-[300px] sm:w-[400px] overflow-y-auto"
+            >
               <SheetHeader>
                 <SheetTitle>Filteri</SheetTitle>
               </SheetHeader>
@@ -287,16 +334,8 @@ export default function FilteredProductsView({
           {/* Main content */}
           <div className="flex-1">
             <ProductsToolbar
-              totalProducts={sortedProducts.length}
               sortBy={sortBy}
               onSortChange={setSortBy}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={(items) => {
-                setItemsPerPage(items);
-                setCurrentPage(1);
-              }}
               searchTerm={searchTerm}
               onSearchChange={(value) => {
                 setSearchTerm(value);
