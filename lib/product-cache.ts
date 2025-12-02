@@ -15,17 +15,21 @@ const CACHE_TTL = 30 * 60 * 1000;
 
 /**
  * Get products from cache or fetch if expired
+ * This significantly improves performance by avoiding repeated API calls
  */
 export async function getCachedProducts(language: string = "sr-Latin-CS"): Promise<Product[]> {
   const now = Date.now();
 
+  // Check if cache exists and is still valid
   if (productsCache && (now - productsCache.timestamp) < CACHE_TTL) {
+    console.log("[Cache] Returning cached products");
     return productsCache.data;
   }
 
   console.log("[Cache] Fetching fresh products from API");
   const products = await apiFetchProducts(language);
 
+  // Update cache
   productsCache = {
     data: products,
     timestamp: now,
@@ -40,13 +44,16 @@ export async function getCachedProducts(language: string = "sr-Latin-CS"): Promi
 export async function getCachedCategories(language: string = "sr-Latin-CS"): Promise<Category[]> {
   const now = Date.now();
 
+  // Check if cache exists and is still valid
   if (categoriesCache && (now - categoriesCache.timestamp) < CACHE_TTL) {
+    console.log("[Cache] Returning cached categories");
     return categoriesCache.data;
   }
 
   console.log("[Cache] Fetching fresh categories from API");
   const categories = await apiFetchCategories(language);
 
+  // Update cache
   categoriesCache = {
     data: categories,
     timestamp: now,
@@ -56,11 +63,12 @@ export async function getCachedCategories(language: string = "sr-Latin-CS"): Pro
 }
 
 /**
- * Manually clear the cache
+ * Manually clear the cache (useful for testing or after data updates)
  */
 export function clearProductCache() {
   productsCache = null;
   categoriesCache = null;
+  console.log("[Cache] Cache cleared");
 }
 
 /**
@@ -84,33 +92,100 @@ export function getCacheStats() {
 
 /**
  * Pre-warm the cache by loading data in the background
+ * This ensures the first user request is fast
  */
 export async function warmupCache(language: string = "sr-Latin-CS"): Promise<void> {
-  console.log("[Cache Warmup] Starting...");
+  console.log("[Cache Warmup] Starting cache warmup...");
   const startTime = Date.now();
 
   try {
+    // Load both in parallel for faster warmup
     await Promise.all([
       getCachedProducts(language),
       getCachedCategories(language),
     ]);
 
     const duration = Date.now() - startTime;
-    console.log(`[Cache Warmup] Done in ${duration}ms`);
+    console.log(`[Cache Warmup] ✅ Cache warmed up successfully in ${duration}ms`);
   } catch (error) {
-    console.error("[Cache Warmup] Failed:", error);
+    console.error("[Cache Warmup] ❌ Failed to warm up cache:", error);
   }
 }
 
-// Track if warmup is in progress
+// Track if warmup is in progress to avoid duplicate warmups
 let warmupPromise: Promise<void> | null = null;
 
 /**
  * Warm up cache only once (idempotent)
+ * Safe to call multiple times - will only warm up once
  */
 export function warmupCacheOnce(language: string = "sr-Latin-CS"): Promise<void> {
   if (!warmupPromise) {
     warmupPromise = warmupCache(language);
   }
   return warmupPromise;
+}
+
+/**
+ * Get products for a specific category (FAST - only returns filtered products)
+ * This is MUCH faster than returning all products and filtering on client
+ */
+export async function getProductsByCategory(
+  categoryId: string,
+  language: string = "sr-Latin-CS"
+): Promise<Product[]> {
+  console.log(`[Cache] Filtering products for category: ${categoryId}`);
+  const startTime = Date.now();
+
+  // Get all products from cache (instant if already cached)
+  const allProducts = await getCachedProducts(language);
+  const allCategories = await getCachedCategories(language);
+
+  // Find the category to check if it's a subcategory
+  const category = allCategories.find((c) => c.Id === categoryId);
+  const isSubcategory = category?.Parent !== "*";
+
+  // Filter products by category or subcategory
+  const filteredProducts = allProducts.filter((product) => {
+    let categoryMatch = false;
+    if (typeof product.Category === "object" && product.Category !== null) {
+      categoryMatch = product.Category.Id === categoryId;
+    } else if (typeof product.Category === "string") {
+      categoryMatch = product.Category === categoryId;
+    }
+
+    let subCategoryMatch = false;
+    if (product.SubCategory) {
+      if (
+        typeof product.SubCategory === "object" &&
+        product.SubCategory !== null
+      ) {
+        subCategoryMatch = product.SubCategory.Id === categoryId;
+      } else if (typeof product.SubCategory === "string") {
+        subCategoryMatch = product.SubCategory === categoryId;
+      }
+    }
+
+    // If we're viewing a subcategory, also include products where
+    // the parent category matches and no subcategory is specified
+    let parentCategoryMatch = false;
+    if (isSubcategory && category?.Parent) {
+      if (typeof product.Category === "object" && product.Category !== null) {
+        parentCategoryMatch = product.Category.Id === category.Parent;
+      } else if (typeof product.Category === "string") {
+        parentCategoryMatch = product.Category === category.Parent;
+      }
+    }
+
+    return (
+      categoryMatch ||
+      subCategoryMatch ||
+      (parentCategoryMatch && !product.SubCategory)
+    );
+  });
+
+  const duration = Date.now() - startTime;
+  console.log(`[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`);
+
+  return filteredProducts;
 }
