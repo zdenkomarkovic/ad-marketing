@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(timeout 10 npm run dev:*)"
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout 10 curl:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

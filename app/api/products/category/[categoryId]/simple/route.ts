@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchProducts, fetchCategories } from '@/lib/promosolution-api';
+import { getCachedProducts, getCachedCategories } from '@/lib/product-cache';
 import { groupProductsByBaseId } from '@/lib/product-grouping';
 
 /**
@@ -22,10 +22,10 @@ export async function GET(
     console.log(`[API Paginated] Category: ${decodedCategoryId}, Page: ${page}, Limit: ${limit}`);
     const startTime = Date.now();
 
-    // Fetch everything directly (like the other site)
+    // Fetch from cache (instant if already cached, ~30min TTL)
     const [allProducts, allCategories] = await Promise.all([
-      fetchProducts("sr-Latin-CS"),
-      fetchCategories("sr-Latin-CS"),
+      getCachedProducts("sr-Latin-CS"),
+      getCachedCategories("sr-Latin-CS"),
     ]);
 
     const category = allCategories.find((c) => c.Id === decodedCategoryId);
