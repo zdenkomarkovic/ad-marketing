@@ -35,8 +35,6 @@ export default function FilteredProductsView({
   });
 
   const [sortBy, setSortBy] = useState("name-asc");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
