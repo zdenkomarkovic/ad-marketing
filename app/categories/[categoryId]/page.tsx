@@ -1,4 +1,4 @@
-import { fetchProducts, fetchCategories } from "@/lib/promosolution-api";
+import { getCachedProducts, getCachedCategories } from "@/lib/product-cache";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
@@ -55,8 +55,8 @@ export default async function CategoryPage({ params }: Props) {
   const { categoryId } = await params;
   const decodedCategoryId = decodeURIComponent(categoryId);
 
-  const allProducts = await fetchProducts("sr-Latin-CS");
-  const allCategories = await fetchCategories("sr-Latin-CS");
+  const allProducts = await getCachedProducts("sr-Latin-CS");
+  const allCategories = await getCachedCategories("sr-Latin-CS");
 
   const category = allCategories.find((c) => c.Id === decodedCategoryId);
   const categoryName = category?.Name || decodedCategoryId;

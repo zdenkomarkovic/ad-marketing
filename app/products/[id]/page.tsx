@@ -1,4 +1,5 @@
-import { fetchProducts, fetchProduct } from "@/lib/promosolution-api";
+import { getCachedProducts } from "@/lib/product-cache";
+import { fetchProduct } from "@/lib/promosolution-api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groupProductsByBaseId, getBaseId } from "@/lib/product-grouping";
@@ -31,8 +32,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Decode the ID from URL
   const productId = decodeURIComponent(resolvedParams.id);
 
-  // Fetch all products
-  const allProducts = await fetchProducts("sr-Latin-CS");
+  // Fetch all products (from cache)
+  const allProducts = await getCachedProducts("sr-Latin-CS");
 
   // Group products
   const groupedProducts = groupProductsByBaseId(allProducts);

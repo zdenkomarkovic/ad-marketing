@@ -28,7 +28,8 @@
       "Bash(node test-api-endpoints.js:*)",
       "Bash(node test-real-stock.js:*)",
       "Bash(node test-product-details.js:*)",
-      "Bash(node test-extract-details.js:*)"
+      "Bash(node test-extract-details.js:*)",
+      "Bash(node -e \"fetch(''https://apiv1.promosolution.services/token'', {method: ''POST'', headers: {''Content-Type'': ''application/x-www-form-urlencoded''}, body: ''grant_type=password&username=admarketing&password=dRem-IpagI23C-hlpodAku''}).then(r => r.json()).then(d => fetch(''https://apiv1.promosolution.services/sr-Latin-CS/api/Product'', {headers: {''Authorization'': ''Bearer '' + d.access_token}}).then(r => r.json()).then(products => console.log(''Total products:'', products.length)))\")"
     ],
     "deny": [],
     "ask": []

@@ -1,5 +1,5 @@
 import ConditionalLayout from "@/components/ConditionalLayout";
-import { fetchCategories, fetchProducts } from "@/lib/promosolution-api";
+import { getCachedCategories, getCachedProducts } from "@/lib/product-cache";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -62,8 +62,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [categories, products] = await Promise.all([
-    fetchCategories("sr-Latin-CS"),
-    fetchProducts("sr-Latin-CS"),
+    getCachedCategories("sr-Latin-CS"),
+    getCachedProducts("sr-Latin-CS"),
   ]);
 
   // Count products per category

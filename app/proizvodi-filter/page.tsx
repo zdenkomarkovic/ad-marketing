@@ -1,4 +1,4 @@
-import { fetchProducts } from "@/lib/promosolution-api";
+import { getCachedProducts } from "@/lib/product-cache";
 import GroupedFilteredProductsView from "@/components/GroupedFilteredProductsView";
 import { Suspense } from "react";
 
@@ -38,7 +38,7 @@ function ProductsViewSkeleton() {
 }
 
 export default async function ProizvodiFilterPage() {
-  const products = await fetchProducts("sr-Latin-CS");
+  const products = await getCachedProducts("sr-Latin-CS");
 
   return (
     <>
