@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react";
 import ProductsSidebar from "./ProductsSidebar";
 import ProductsToolbar from "./ProductsToolbar";
-import ProductCard from "./ProductCard";
-import Pagination from "./Pagination";
 import ActiveFilters from "./ActiveFilters";
 import { Product } from "@/lib/promosolution-api";
 import { Filter } from "lucide-react";
@@ -342,7 +340,7 @@ export default function FilteredProductsView({
               onClearAll={handleClearAllFilters}
             />
 
-            {/* Products grid/list */}
+            {/* Products grid/list
             {paginatedProducts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-lg text-muted-foreground">
@@ -374,7 +372,7 @@ export default function FilteredProductsView({
                   </div>
                 )}
               </>
-            )}
+            )} */}
           </div>
         </div>
       </div>
