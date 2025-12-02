@@ -1,5 +1,4 @@
 import { getCachedProducts } from "@/lib/product-cache";
-import { fetchProduct } from "@/lib/promosolution-api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groupProductsByBaseId, getBaseId } from "@/lib/product-grouping";
@@ -54,8 +53,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Fetch full product details for the current variant
-  const fullProduct = await fetchProduct(productId, "sr-Latin-CS");
+  // Find the raw product data from cache (has more details than grouped variant)
+  const cachedProduct = allProducts.find((p) => p.Id === productId);
 
   return (
     <>
@@ -73,7 +72,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <DetailedProductView
             groupedProduct={groupedProduct}
             currentVariantId={productId}
-            fullProduct={fullProduct || undefined}
+            fullProduct={cachedProduct || undefined}
           />
         </div>
       </main>

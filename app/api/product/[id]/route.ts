@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchProduct } from "@/lib/promosolution-api";
+import { getCachedProducts } from "@/lib/product-cache";
 
 export async function GET(
   request: NextRequest,
@@ -9,7 +9,9 @@ export async function GET(
     const { id } = await params;
     const productId = decodeURIComponent(id);
 
-    const product = await fetchProduct(productId, "sr-Latin-CS");
+    // Get product from cache instead of making API call
+    const allProducts = await getCachedProducts("sr-Latin-CS");
+    const product = allProducts.find((p) => p.Id === productId);
 
     if (!product) {
       return NextResponse.json(
