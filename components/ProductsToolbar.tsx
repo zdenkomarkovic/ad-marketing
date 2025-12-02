@@ -1,55 +1,20 @@
 "use client";
 
-import { LayoutGrid, List } from "lucide-react";
-import { Button } from "./ui/button";
-
 interface ProductsToolbarProps {
-  totalProducts: number;
   sortBy: string;
   onSortChange: (sortBy: string) => void;
-  viewMode: "grid" | "list";
-  onViewModeChange: (mode: "grid" | "list") => void;
-  itemsPerPage: number;
-  onItemsPerPageChange: (items: number) => void;
   searchTerm: string;
   onSearchChange: (searchTerm: string) => void;
 }
 
 export default function ProductsToolbar({
-  totalProducts,
   sortBy,
   onSortChange,
-  viewMode,
-  onViewModeChange,
-  itemsPerPage,
-  onItemsPerPageChange,
   searchTerm,
   onSearchChange,
 }: ProductsToolbarProps) {
   return (
     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6 p-4 bg-card border border-border rounded-lg">
-      {/* Left side - Product count and items per page */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <p className="text-sm text-muted-foreground">
-          Ukupno proizvoda:{" "}
-          <span className="font-semibold text-foreground">{totalProducts}</span>
-        </p>
-
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-muted-foreground">Prikaži po:</label>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="px-3 py-1.5 text-sm text-muted border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-          >
-            <option value={12}>12</option>
-            <option value={24}>24</option>
-            <option value={36}>36</option>
-            <option value={48}>48</option>
-          </select>
-        </div>
-      </div>
-
       {/* Middle - Search bar */}
       <div className="relative w-full lg:w-80 xl:w-96">
         <input
@@ -57,7 +22,7 @@ export default function ProductsToolbar({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Pretraži po imenu ili šifri..."
-          className="w-full text-muted px-4 py-1.5 placeholder:text-muted pl-9 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+          className="w-full text-muted px-4 py-1.5 placeholder:text-muted pl-9 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
         />
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"
@@ -109,25 +74,6 @@ export default function ProductsToolbar({
             <option value="price-desc">Cena (viša prvo)</option>
             <option value="newest">Najnovije</option>
           </select>
-        </div>
-
-        <div className="flex items-center gap-1 border border-border rounded-md p-1">
-          <Button
-            variant={viewMode === "grid" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewModeChange("grid")}
-            className="h-8 w-8 p-0"
-          >
-            <LayoutGrid className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => onViewModeChange("list")}
-            className="h-8 w-8 p-0"
-          >
-            <List className="w-4 h-4" />
-          </Button>
         </div>
       </div>
     </div>

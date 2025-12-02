@@ -23,13 +23,17 @@ export default function SimpleCategoryView({
   categoryId,
 }: SimpleCategoryViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 64;
+  const productsPerPage = 32;
   const [sortBy, setSortBy] = useState("name-asc");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
   const [searchTerm, setSearchTerm] = useState("");
 
   // SWR handles caching - won't refetch on back navigation
-  const { data: products, error, isLoading } = useSWR(
+  const {
+    data: products,
+    error,
+    isLoading,
+  } = useSWR(
     `/api/products/category/${encodeURIComponent(categoryId)}/simple`,
     fetcher,
     {
@@ -68,19 +72,17 @@ export default function SimpleCategoryView({
   const totalProducts = filteredProducts.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + productsPerPage
+  );
 
   return (
     <div className="py-8 md:py-12 bg-background">
       <div className="max-w-[90rem] mx-auto px-4 md:px-8">
         <ProductsToolbar
-          totalProducts={totalProducts}
           sortBy={sortBy}
           onSortChange={setSortBy}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          itemsPerPage={productsPerPage}
-          onItemsPerPageChange={() => {}}
           searchTerm={searchTerm}
           onSearchChange={(value) => {
             setSearchTerm(value);
@@ -92,7 +94,10 @@ export default function SimpleCategoryView({
         {isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mt-6">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="bg-card rounded-lg overflow-hidden border border-border animate-pulse">
+              <div
+                key={i}
+                className="bg-card rounded-lg overflow-hidden border border-border animate-pulse"
+              >
                 <div className="aspect-square bg-muted" />
                 <div className="p-4 space-y-3">
                   <div className="h-4 bg-muted rounded w-3/4" />
@@ -114,17 +119,16 @@ export default function SimpleCategoryView({
         {/* Empty State */}
         {!isLoading && !error && filteredProducts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">Nema dostupnih proizvoda.</p>
+            <p className="text-lg text-muted-foreground">
+              Nema dostupnih proizvoda.
+            </p>
           </div>
         )}
 
         {/* Products Grid */}
         {!isLoading && !error && paginatedProducts.length > 0 && (
           <>
-            <div className={viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mt-6"
-              : "flex flex-col gap-4 mt-6"
-            }>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mt-6">
               {paginatedProducts.map((product) => (
                 <GroupedProductCard key={product.baseId} product={product} />
               ))}
@@ -144,7 +148,9 @@ export default function SimpleCategoryView({
                   Stranica {currentPage} od {totalPages}
                 </span>
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 bg-primary text-white rounded disabled:opacity-50"
                 >
