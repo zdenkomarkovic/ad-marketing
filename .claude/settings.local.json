@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(del E:Sajtoviad-marketingmiddleware.ts)",
-      "Bash(node -e \"fetch(''https://apiv1.promosolution.services/token'', {method: ''POST'', headers: {''Content-Type'': ''application/x-www-form-urlencoded''}, body: ''grant_type=password&username=admarketing&password=dRem-IpagI23C-hlpodAku''}).then(r => r.json()).then(d => fetch(''https://apiv1.promosolution.services/sr-Latin-CS/api/Product'', {headers: {''Authorization'': ''Bearer '' + d.access_token}}).then(r => r.json()).then(products => {const counts = {}; products.forEach(p => {const cat = typeof p.Category === ''object'' ? p.Category.Id : p.Category; if(cat) counts[cat] = (counts[cat] || 0) + 1;}); const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); console.log(''Top 10 categories by product count:''); sorted.slice(0,10).forEach(([cat, count]) => console.log(cat + '': '' + count + '' products''));}))\")"
+      "Bash(timeout 10 npm run dev:*)"
     ],
     "deny": [],
     "ask": []
