@@ -1,35 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)",
-      "Bash(dir \".claude\\commands\")",
-      "Bash(npm run dev:*)",
-      "Bash(netstat:*)",
-      "Bash(findstr:*)",
-      "Bash(npm install:*)",
-      "Bash(dir /b)",
-      "Bash(paste:*)",
-      "Bash(npm run build:*)",
-      "WebFetch(domain:promobox.com)",
-      "Bash(timeout /t 5 /nobreak)",
-      "Bash(node test-api-debug.js:*)",
-      "Bash(node test-textile-products.js:*)",
-      "Bash(node test-detailed-structure.js:*)",
-      "Bash(node test-groups.js:*)",
-      "Bash(curl:*)",
-      "Bash(node test-fixed-categories.js:*)",
-      "Bash(node test-textile-grouping.js:*)",
-      "Bash(node test-image-api.js:*)",
-      "Bash(node analyze-textile-ids.js:*)",
-      "Bash(node analyze-problematic-ids.js:*)",
-      "Bash(node test-combined-sizes.js:*)",
-      "Bash(node get-all-colors.js:*)",
-      "Bash(node test-stock-structure.js:*)",
-      "Bash(node test-api-endpoints.js:*)",
-      "Bash(node test-real-stock.js:*)",
-      "Bash(node test-product-details.js:*)",
-      "Bash(node test-extract-details.js:*)",
-      "Bash(node -e \"fetch(''https://apiv1.promosolution.services/token'', {method: ''POST'', headers: {''Content-Type'': ''application/x-www-form-urlencoded''}, body: ''grant_type=password&username=admarketing&password=dRem-IpagI23C-hlpodAku''}).then(r => r.json()).then(d => fetch(''https://apiv1.promosolution.services/sr-Latin-CS/api/Product'', {headers: {''Authorization'': ''Bearer '' + d.access_token}}).then(r => r.json()).then(products => console.log(''Total products:'', products.length)))\")"
+      "Bash(del E:Sajtoviad-marketingmiddleware.ts)"
     ],
     "deny": [],
     "ask": []

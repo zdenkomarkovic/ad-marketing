@@ -89,3 +89,39 @@ export function getCacheStats() {
     } : null,
   };
 }
+
+/**
+ * Pre-warm the cache by loading data in the background
+ * This ensures the first user request is fast
+ */
+export async function warmupCache(language: string = "sr-Latin-CS"): Promise<void> {
+  console.log("[Cache Warmup] Starting cache warmup...");
+  const startTime = Date.now();
+
+  try {
+    // Load both in parallel for faster warmup
+    await Promise.all([
+      getCachedProducts(language),
+      getCachedCategories(language),
+    ]);
+
+    const duration = Date.now() - startTime;
+    console.log(`[Cache Warmup] ✅ Cache warmed up successfully in ${duration}ms`);
+  } catch (error) {
+    console.error("[Cache Warmup] ❌ Failed to warm up cache:", error);
+  }
+}
+
+// Track if warmup is in progress to avoid duplicate warmups
+let warmupPromise: Promise<void> | null = null;
+
+/**
+ * Warm up cache only once (idempotent)
+ * Safe to call multiple times - will only warm up once
+ */
+export function warmupCacheOnce(language: string = "sr-Latin-CS"): Promise<void> {
+  if (!warmupPromise) {
+    warmupPromise = warmupCache(language);
+  }
+  return warmupPromise;
+}

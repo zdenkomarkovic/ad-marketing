@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Production source maps disabled for smaller bundles
   productionBrowserSourceMaps: false,
+  // Note: instrumentation.ts is enabled by default in Next.js 15
 };
 
 export default nextConfig;
