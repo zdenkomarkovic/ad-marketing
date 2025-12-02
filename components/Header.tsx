@@ -26,26 +26,15 @@ interface Category {
 
 interface HeaderProps {
   categories: Category[];
-  categoryProductCount?: Record<string, number>;
 }
 
 const mobTitleStyles = "text-lg py-2  text-muted";
 
-const MobileMenu = ({ categories, categoryProductCount }: { categories: Category[]; categoryProductCount?: Record<string, number> }) => {
+const MobileMenu = ({ categories }: { categories: Category[] }) => {
   const [expandedCategory, setExpandedCategory] = useState(false);
 
-  // Filter parent categories - only show those with products or subcategories with products
-  const parentCategories = categories.filter((c) => {
-    if (c.Parent !== "*") return false;
-    if (categoryProductCount) {
-      const hasProducts = (categoryProductCount[c.Id] || 0) > 0;
-      const hasSubcategoriesWithProducts = categories.some(
-        (subcat) => subcat.Parent === c.Id && (categoryProductCount[subcat.Id] || 0) > 0
-      );
-      return hasProducts || hasSubcategoriesWithProducts;
-    }
-    return true;
-  });
+  // Show ALL parent categories
+  const parentCategories = categories.filter((c) => c.Parent === "*");
 
   return (
     <Sheet>
@@ -108,7 +97,7 @@ const MobileMenu = ({ categories, categoryProductCount }: { categories: Category
   );
 };
 
-const DesktopNav = ({ categories, categoryProductCount }: { categories: Category[]; categoryProductCount?: Record<string, number> }) => (
+const DesktopNav = ({ categories }: { categories: Category[] }) => (
   <ul className="hidden gap-8 lg:flex  text-xl">
     {navList.map((item, index) => {
       if (item.hasDropdown) {
@@ -123,7 +112,7 @@ const DesktopNav = ({ categories, categoryProductCount }: { categories: Category
                 <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
               </motion.div>
             </Link>
-            <CategoriesDropdown categories={categories} categoryProductCount={categoryProductCount} />
+            <CategoriesDropdown categories={categories} />
           </li>
         );
       }
@@ -141,7 +130,7 @@ const DesktopNav = ({ categories, categoryProductCount }: { categories: Category
   </ul>
 );
 
-export default function Header({ categories, categoryProductCount }: HeaderProps) {
+export default function Header({ categories }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -175,7 +164,7 @@ export default function Header({ categories, categoryProductCount }: HeaderProps
             className=""
           />
         </Link>
-        <DesktopNav categories={categories} categoryProductCount={categoryProductCount} />
+        <DesktopNav categories={categories} />
         <Link href="tel:+381691015511">
           <motion.button
             whileHover={{
@@ -188,7 +177,7 @@ export default function Header({ categories, categoryProductCount }: HeaderProps
             <p className="">069/101 55 11</p>
           </motion.button>
         </Link>
-        <MobileMenu categories={categories} categoryProductCount={categoryProductCount} />
+        <MobileMenu categories={categories} />
       </nav>
     </header>
   );

@@ -11,11 +11,10 @@ interface Category {
 
 interface CategoriesDropdownProps {
   categories: Category[];
-  categoryProductCount?: Record<string, number>;
 }
 
-export default function CategoriesDropdown({ categories, categoryProductCount }: CategoriesDropdownProps) {
-  // Get parent categories
+export default function CategoriesDropdown({ categories }: CategoriesDropdownProps) {
+  // Get ALL parent categories - show everything
   const parentCategories = categories.filter((c) => c.Parent === "*");
 
   if (parentCategories.length === 0) {
@@ -26,15 +25,8 @@ export default function CategoriesDropdown({ categories, categoryProductCount }:
     <div className="opacity-0 group-hover:opacity-100 invisible group-hover:visible absolute left-0 top-full mt-2 bg-white dark:bg-gray-800 border-2 border-primary/20 rounded-xl shadow-2xl z-[9999] min-w-[300px] w-max transition-all">
       <div className="py-3">
         {parentCategories.map((category) => {
-          // Filter subcategories - only show those with products
-          const subcategories = categories.filter((c) => {
-            if (c.Parent !== category.Id) return false;
-            // If we have product count info, only include subcategories with products
-            if (categoryProductCount) {
-              return (categoryProductCount[c.Id] || 0) > 0;
-            }
-            return true;
-          });
+          // Show ALL subcategories
+          const subcategories = categories.filter((c) => c.Parent === category.Id);
           const hasSubcategories = subcategories.length > 0;
 
           return (
