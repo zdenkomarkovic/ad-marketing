@@ -1,5 +1,4 @@
 import { getCachedProducts } from "@/lib/product-cache";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groupProductsByBaseId, getBaseId } from "@/lib/product-grouping";
 import dynamic from "next/dynamic";
