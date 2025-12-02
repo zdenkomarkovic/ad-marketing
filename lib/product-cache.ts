@@ -125,3 +125,67 @@ export function warmupCacheOnce(language: string = "sr-Latin-CS"): Promise<void>
   }
   return warmupPromise;
 }
+
+/**
+ * Get products for a specific category (FAST - only returns filtered products)
+ * This is MUCH faster than returning all products and filtering on client
+ */
+export async function getProductsByCategory(
+  categoryId: string,
+  language: string = "sr-Latin-CS"
+): Promise<Product[]> {
+  console.log(`[Cache] Filtering products for category: ${categoryId}`);
+  const startTime = Date.now();
+
+  // Get all products from cache (instant if already cached)
+  const allProducts = await getCachedProducts(language);
+  const allCategories = await getCachedCategories(language);
+
+  // Find the category to check if it's a subcategory
+  const category = allCategories.find((c) => c.Id === categoryId);
+  const isSubcategory = category?.Parent !== "*";
+
+  // Filter products by category or subcategory
+  const filteredProducts = allProducts.filter((product) => {
+    let categoryMatch = false;
+    if (typeof product.Category === "object" && product.Category !== null) {
+      categoryMatch = product.Category.Id === categoryId;
+    } else if (typeof product.Category === "string") {
+      categoryMatch = product.Category === categoryId;
+    }
+
+    let subCategoryMatch = false;
+    if (product.SubCategory) {
+      if (
+        typeof product.SubCategory === "object" &&
+        product.SubCategory !== null
+      ) {
+        subCategoryMatch = product.SubCategory.Id === categoryId;
+      } else if (typeof product.SubCategory === "string") {
+        subCategoryMatch = product.SubCategory === categoryId;
+      }
+    }
+
+    // If we're viewing a subcategory, also include products where
+    // the parent category matches and no subcategory is specified
+    let parentCategoryMatch = false;
+    if (isSubcategory && category?.Parent) {
+      if (typeof product.Category === "object" && product.Category !== null) {
+        parentCategoryMatch = product.Category.Id === category.Parent;
+      } else if (typeof product.Category === "string") {
+        parentCategoryMatch = product.Category === category.Parent;
+      }
+    }
+
+    return (
+      categoryMatch ||
+      subCategoryMatch ||
+      (parentCategoryMatch && !product.SubCategory)
+    );
+  });
+
+  const duration = Date.now() - startTime;
+  console.log(`[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`);
+
+  return filteredProducts;
+}
