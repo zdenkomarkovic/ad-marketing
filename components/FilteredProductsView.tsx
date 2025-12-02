@@ -35,6 +35,7 @@ export default function FilteredProductsView({
   });
 
   const [sortBy, setSortBy] = useState("name-asc");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -234,13 +235,6 @@ export default function FilteredProductsView({
   }, [filteredProducts, sortBy]);
 
   // Paginate products
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return sortedProducts.slice(startIndex, endIndex);
-  }, [sortedProducts, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
 
   // Reset to page 1 when filters change
   const handleFilterChange = (newFilters: typeof selectedFilters) => {
