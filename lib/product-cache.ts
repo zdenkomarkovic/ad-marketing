@@ -1,5 +1,5 @@
 // Server-side product cache to avoid re-fetching all products on every request
-import { Product, fetchProducts as apiFetchProducts, fetchCategories as apiFetchCategories, Category } from "./promosolution-api";
+import { Product, fetchProducts as apiFetchProducts, fetchCategories as apiFetchCategories, fetchProduct as apiFetchProduct, Category } from "./promosolution-api";
 
 interface CacheEntry<T> {
   data: T;
@@ -188,4 +188,38 @@ export async function getProductsByCategory(
   console.log(`[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`);
 
   return filteredProducts;
+}
+
+/**
+ * Check if cache is warm (has data)
+ */
+export function isCacheWarm(): boolean {
+  return productsCache !== null && categoriesCache !== null;
+}
+
+/**
+ * Get a single product - uses cache if available, otherwise direct API call
+ * This provides fast response (~0.4s) even when cache is cold
+ */
+export async function getProduct(
+  productId: string,
+  language: string = "sr-Latin-CS"
+): Promise<Product | null> {
+  const startTime = Date.now();
+
+  // If cache is warm, use it (instant lookup)
+  if (productsCache) {
+    const product = productsCache.data.find((p) => p.Id === productId);
+    if (product) {
+      console.log(`[Cache] Found product ${productId} in cache in ${Date.now() - startTime}ms`);
+      return product;
+    }
+  }
+
+  // Cache miss or not warm - fetch directly from API (fast ~0.4s)
+  console.log(`[Cache] Product ${productId} not in cache, fetching from API...`);
+  const product = await apiFetchProduct(productId, language);
+  console.log(`[Cache] Fetched product ${productId} from API in ${Date.now() - startTime}ms`);
+
+  return product;
 }

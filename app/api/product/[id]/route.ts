@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCachedProducts } from "@/lib/product-cache";
+import { getProduct } from "@/lib/product-cache";
 
 export async function GET(
   request: NextRequest,
@@ -9,9 +9,8 @@ export async function GET(
     const { id } = await params;
     const productId = decodeURIComponent(id);
 
-    // Get product from cache instead of making API call
-    const allProducts = await getCachedProducts("sr-Latin-CS");
-    const product = allProducts.find((p) => p.Id === productId);
+    // Get product - uses cache if warm, otherwise direct API call (~0.4s)
+    const product = await getProduct(productId, "sr-Latin-CS");
 
     if (!product) {
       return NextResponse.json(
