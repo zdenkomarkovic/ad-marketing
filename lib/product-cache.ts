@@ -1,5 +1,10 @@
 // Server-side product cache to avoid re-fetching all products on every request
-import { Product, fetchProducts as apiFetchProducts, fetchCategories as apiFetchCategories, Category } from "./promosolution-api";
+import {
+  Product,
+  fetchProducts as apiFetchProducts,
+  fetchCategories as apiFetchCategories,
+  Category,
+} from "./promosolution-api";
 import { groupProductsByBaseId, GroupedProduct } from "./product-grouping";
 
 interface CacheEntry<T> {
@@ -12,7 +17,10 @@ let productsCache: CacheEntry<Product[]> | null = null;
 let categoriesCache: CacheEntry<Category[]> | null = null;
 
 // Cache for grouped products by category (KEY: categoryId, VALUE: grouped products)
-let groupedProductsByCategory: Map<string, CacheEntry<GroupedProduct[]>> = new Map();
+const groupedProductsByCategory: Map<
+  string,
+  CacheEntry<GroupedProduct[]>
+> = new Map();
 
 // Cache TTL - 30 minutes (in milliseconds)
 const CACHE_TTL = 30 * 60 * 1000;
@@ -21,11 +29,13 @@ const CACHE_TTL = 30 * 60 * 1000;
  * Get products from cache or fetch if expired
  * This significantly improves performance by avoiding repeated API calls
  */
-export async function getCachedProducts(language: string = "sr-Latin-CS"): Promise<Product[]> {
+export async function getCachedProducts(
+  language: string = "sr-Latin-CS"
+): Promise<Product[]> {
   const now = Date.now();
 
   // Check if cache exists and is still valid
-  if (productsCache && (now - productsCache.timestamp) < CACHE_TTL) {
+  if (productsCache && now - productsCache.timestamp < CACHE_TTL) {
     console.log("[Cache] Returning cached products");
     return productsCache.data;
   }
@@ -45,11 +55,13 @@ export async function getCachedProducts(language: string = "sr-Latin-CS"): Promi
 /**
  * Get categories from cache or fetch if expired
  */
-export async function getCachedCategories(language: string = "sr-Latin-CS"): Promise<Category[]> {
+export async function getCachedCategories(
+  language: string = "sr-Latin-CS"
+): Promise<Category[]> {
   const now = Date.now();
 
   // Check if cache exists and is still valid
-  if (categoriesCache && (now - categoriesCache.timestamp) < CACHE_TTL) {
+  if (categoriesCache && now - categoriesCache.timestamp < CACHE_TTL) {
     console.log("[Cache] Returning cached categories");
     return categoriesCache.data;
   }
@@ -82,16 +94,24 @@ export function clearProductCache() {
 export function getCacheStats() {
   const now = Date.now();
   return {
-    products: productsCache ? {
-      count: productsCache.data.length,
-      age: Math.round((now - productsCache.timestamp) / 1000),
-      expiresIn: Math.round((CACHE_TTL - (now - productsCache.timestamp)) / 1000),
-    } : null,
-    categories: categoriesCache ? {
-      count: categoriesCache.data.length,
-      age: Math.round((now - categoriesCache.timestamp) / 1000),
-      expiresIn: Math.round((CACHE_TTL - (now - categoriesCache.timestamp)) / 1000),
-    } : null,
+    products: productsCache
+      ? {
+          count: productsCache.data.length,
+          age: Math.round((now - productsCache.timestamp) / 1000),
+          expiresIn: Math.round(
+            (CACHE_TTL - (now - productsCache.timestamp)) / 1000
+          ),
+        }
+      : null,
+    categories: categoriesCache
+      ? {
+          count: categoriesCache.data.length,
+          age: Math.round((now - categoriesCache.timestamp) / 1000),
+          expiresIn: Math.round(
+            (CACHE_TTL - (now - categoriesCache.timestamp)) / 1000
+          ),
+        }
+      : null,
   };
 }
 
@@ -99,7 +119,9 @@ export function getCacheStats() {
  * Pre-warm the cache by loading data in the background
  * This ensures the first user request is fast
  */
-export async function warmupCache(language: string = "sr-Latin-CS"): Promise<void> {
+export async function warmupCache(
+  language: string = "sr-Latin-CS"
+): Promise<void> {
   console.log("[Cache Warmup] Starting cache warmup...");
   const startTime = Date.now();
 
@@ -111,7 +133,9 @@ export async function warmupCache(language: string = "sr-Latin-CS"): Promise<voi
     ]);
 
     const duration = Date.now() - startTime;
-    console.log(`[Cache Warmup] ✅ Cache warmed up successfully in ${duration}ms`);
+    console.log(
+      `[Cache Warmup] ✅ Cache warmed up successfully in ${duration}ms`
+    );
   } catch (error) {
     console.error("[Cache Warmup] ❌ Failed to warm up cache:", error);
   }
@@ -124,7 +148,9 @@ let warmupPromise: Promise<void> | null = null;
  * Warm up cache only once (idempotent)
  * Safe to call multiple times - will only warm up once
  */
-export function warmupCacheOnce(language: string = "sr-Latin-CS"): Promise<void> {
+export function warmupCacheOnce(
+  language: string = "sr-Latin-CS"
+): Promise<void> {
   if (!warmupPromise) {
     warmupPromise = warmupCache(language);
   }
@@ -190,7 +216,9 @@ export async function getProductsByCategory(
   });
 
   const duration = Date.now() - startTime;
-  console.log(`[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`);
+  console.log(
+    `[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`
+  );
 
   return filteredProducts;
 }
@@ -207,12 +235,16 @@ export async function getGroupedProductsByCategory(
 
   // Check if we have a valid cached version for this category
   const cached = groupedProductsByCategory.get(categoryId);
-  if (cached && (now - cached.timestamp) < CACHE_TTL) {
-    console.log(`[Cache] ✅ Returning cached grouped products for category: ${categoryId} (${cached.data.length} products)`);
+  if (cached && now - cached.timestamp < CACHE_TTL) {
+    console.log(
+      `[Cache] ✅ Returning cached grouped products for category: ${categoryId} (${cached.data.length} products)`
+    );
     return cached.data;
   }
 
-  console.log(`[Cache] ⏳ Computing grouped products for category: ${categoryId} (first time)`);
+  console.log(
+    `[Cache] ⏳ Computing grouped products for category: ${categoryId} (first time)`
+  );
   const startTime = Date.now();
 
   // Get filtered products for this category
@@ -228,7 +260,9 @@ export async function getGroupedProductsByCategory(
   });
 
   const duration = Date.now() - startTime;
-  console.log(`[Cache] ✅ Cached ${products.length} products → ${groupedProducts.length} grouped variants in ${duration}ms`);
+  console.log(
+    `[Cache] ✅ Cached ${products.length} products → ${groupedProducts.length} grouped variants in ${duration}ms`
+  );
 
   return groupedProducts;
 }
@@ -249,10 +283,15 @@ export async function getPaginatedGroupedProducts(
   totalPages: number;
   hasMore: boolean;
 }> {
-  console.log(`[Cache] Getting paginated products for category ${categoryId}, page ${page}, limit ${limit}`);
+  console.log(
+    `[Cache] Getting paginated products for category ${categoryId}, page ${page}, limit ${limit}`
+  );
 
   // Get all grouped products for this category (from cache if available)
-  const allGroupedProducts = await getGroupedProductsByCategory(categoryId, language);
+  const allGroupedProducts = await getGroupedProductsByCategory(
+    categoryId,
+    language
+  );
 
   // Calculate pagination
   const total = allGroupedProducts.length;
