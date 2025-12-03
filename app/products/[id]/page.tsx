@@ -32,30 +32,39 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Decode the ID from URL
   const productId = decodeURIComponent(resolvedParams.id);
 
-  // Fetch all products (from cache)
+  console.log(`[ProductPage] Loading product: ${productId}`);
+  const startTime = Date.now();
+
+  // Fetch all products (from cache - FAST!)
   const allProducts = await getCachedProducts("sr-Latin-CS");
 
-  // Group products
-  const groupedProducts = groupProductsByBaseId(allProducts);
+  // Get product data FIRST (before expensive grouping)
+  const fullProduct = allProducts.find((p) => p.Id === productId);
+
+  if (!fullProduct) {
+    console.log(`[ProductPage] Product not found: ${productId}`);
+    notFound();
+  }
 
   // Extract base ID from the current product ID
   const baseId = getBaseId(productId);
 
-  // Find the grouped product that contains this variant
-  const groupedProduct = groupedProducts.find((gp) => gp.baseId === baseId);
+  // Filter only products with same base ID (much smaller set to group!)
+  const relatedProducts = allProducts.filter((p) => getBaseId(p.Id) === baseId);
+
+  console.log(`[ProductPage] Found ${relatedProducts.length} variants for baseId: ${baseId}`);
+
+  // Group only the related products (FAST - only 5-20 products instead of 5000!)
+  const groupedProducts = groupProductsByBaseId(relatedProducts);
+  const groupedProduct = groupedProducts[0]; // Should be only one group
 
   if (!groupedProduct) {
+    console.log(`[ProductPage] Grouped product not found for baseId: ${baseId}`);
     notFound();
   }
 
-  // Check if the specific variant exists
-  const variantExists = groupedProduct.variants.some((v) => v.id === productId);
-  if (!variantExists) {
-    notFound();
-  }
-
-  // Get product data from cache (already loaded above)
-  const fullProduct = allProducts.find((p) => p.Id === productId);
+  const duration = Date.now() - startTime;
+  console.log(`[ProductPage] ✅ Loaded product in ${duration}ms`);
 
   return (
     <>

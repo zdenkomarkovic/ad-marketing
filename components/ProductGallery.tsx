@@ -11,12 +11,25 @@ interface ProductGalleryProps {
 export default function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
+  // If no images, show placeholder
+  if (!images || images.length === 0 || !images[0]) {
+    return (
+      <div className="space-y-4">
+        <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <div className="animate-pulse">Učitavanje slika...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Main image */}
       <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
         <Image
-          src={images[selectedImageIndex]}
+          src={images[selectedImageIndex] || images[0]}
           alt={productName || "Proizvod"}
           fill
           className="object-contain p-8"

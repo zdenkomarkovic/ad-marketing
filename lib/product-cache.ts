@@ -1,5 +1,6 @@
 // Server-side product cache to avoid re-fetching all products on every request
 import { Product, fetchProducts as apiFetchProducts, fetchCategories as apiFetchCategories, Category } from "./promosolution-api";
+import { groupProductsByBaseId, GroupedProduct } from "./product-grouping";
 
 interface CacheEntry<T> {
   data: T;
@@ -9,6 +10,9 @@ interface CacheEntry<T> {
 // In-memory cache (survives across requests in the same process)
 let productsCache: CacheEntry<Product[]> | null = null;
 let categoriesCache: CacheEntry<Category[]> | null = null;
+
+// Cache for grouped products by category (KEY: categoryId, VALUE: grouped products)
+let groupedProductsByCategory: Map<string, CacheEntry<GroupedProduct[]>> = new Map();
 
 // Cache TTL - 30 minutes (in milliseconds)
 const CACHE_TTL = 30 * 60 * 1000;
@@ -68,6 +72,7 @@ export async function getCachedCategories(language: string = "sr-Latin-CS"): Pro
 export function clearProductCache() {
   productsCache = null;
   categoriesCache = null;
+  groupedProductsByCategory.clear();
   console.log("[Cache] Cache cleared");
 }
 
@@ -188,4 +193,81 @@ export async function getProductsByCategory(
   console.log(`[Cache] Filtered ${filteredProducts.length} products for category ${categoryId} in ${duration}ms`);
 
   return filteredProducts;
+}
+
+/**
+ * Get GROUPED products for a category with caching
+ * This eliminates the need to group products on every request
+ */
+export async function getGroupedProductsByCategory(
+  categoryId: string,
+  language: string = "sr-Latin-CS"
+): Promise<GroupedProduct[]> {
+  const now = Date.now();
+
+  // Check if we have a valid cached version for this category
+  const cached = groupedProductsByCategory.get(categoryId);
+  if (cached && (now - cached.timestamp) < CACHE_TTL) {
+    console.log(`[Cache] ✅ Returning cached grouped products for category: ${categoryId} (${cached.data.length} products)`);
+    return cached.data;
+  }
+
+  console.log(`[Cache] ⏳ Computing grouped products for category: ${categoryId} (first time)`);
+  const startTime = Date.now();
+
+  // Get filtered products for this category
+  const products = await getProductsByCategory(categoryId, language);
+
+  // Group products by base ID (colors/sizes become variants)
+  const groupedProducts = groupProductsByBaseId(products);
+
+  // Cache the grouped products
+  groupedProductsByCategory.set(categoryId, {
+    data: groupedProducts,
+    timestamp: now,
+  });
+
+  const duration = Date.now() - startTime;
+  console.log(`[Cache] ✅ Cached ${products.length} products → ${groupedProducts.length} grouped variants in ${duration}ms`);
+
+  return groupedProducts;
+}
+
+/**
+ * Get paginated grouped products for a category
+ * Returns only the products needed for the current page
+ */
+export async function getPaginatedGroupedProducts(
+  categoryId: string,
+  page: number = 1,
+  limit: number = 32,
+  language: string = "sr-Latin-CS"
+): Promise<{
+  products: GroupedProduct[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}> {
+  console.log(`[Cache] Getting paginated products for category ${categoryId}, page ${page}, limit ${limit}`);
+
+  // Get all grouped products for this category (from cache if available)
+  const allGroupedProducts = await getGroupedProductsByCategory(categoryId, language);
+
+  // Calculate pagination
+  const total = allGroupedProducts.length;
+  const totalPages = Math.ceil(total / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+
+  // Return only the products for this page
+  const paginatedProducts = allGroupedProducts.slice(startIndex, endIndex);
+
+  return {
+    products: paginatedProducts,
+    total,
+    page,
+    totalPages,
+    hasMore: page < totalPages,
+  };
 }
