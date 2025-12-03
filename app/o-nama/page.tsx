@@ -238,6 +238,61 @@ export default function ONama() {
         </div>
       </section>
 
+      {/* Naša proizvodnja */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-background">
+        <div className="container mx-auto px-4 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-primary mb-4">
+              Naša proizvodnja
+            </h2>
+            <p className="text-lg md:text-xl text-muted max-w-3xl mx-auto">
+              Pogledajte kako funkcioniše naša proizvodnja i uverite se u
+              kvalitet našeg rada
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {[
+              {
+                video: "/video/video-2a10b2d588e7ab3407334e0080effaff-V.mp4",
+              },
+              {
+                video: "/video/video-770a0038e4039c4a0d6a55969e047a80-V.mp4",
+              },
+              {
+                video: "/video/video-fcbf20e5e468d01fe8232d65f393a566-V.mp4",
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                className="bg-card rounded-lg overflow-hidden shadow-lg border border-border hover:shadow-xl transition-shadow"
+              >
+                <div className="relative aspect-video bg-muted">
+                  <video
+                    className="w-full h-full object-cover"
+                    controls
+                    preload="metadata"
+                  >
+                    <source src={item.video} type="video/mp4" />
+                    Vaš pretraživač ne podržava video tag.
+                  </video>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Lokacije */}
       <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4 md:px-8">
